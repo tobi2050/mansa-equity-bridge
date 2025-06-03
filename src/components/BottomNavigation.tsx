@@ -14,9 +14,9 @@ const BottomNavigation = ({ userRole }: BottomNavigationProps) => {
   const getNavItems = () => {
     const baseItems = [
       { icon: Home, label: "Dashboard", path: "/" },
-      { icon: Lightbulb, label: "Projects", path: userRole === 'entrepreneur' ? "/funding-opportunities" : "/investment-opportunities" },
-      { icon: Plus, label: "Create", path: "/create-post" },
-      { icon: MessageCircle, label: "Chat", path: "/messages" },
+      { icon: Lightbulb, label: "Projects", path: userRole === 'entrepreneur' ? "/entrepreneur-projects" : "/investment-opportunities" },
+      { icon: Plus, label: "Create", path: userRole === 'entrepreneur' ? "/entrepreneur-create" : "/create-post" },
+      { icon: MessageCircle, label: "Chat", path: userRole === 'entrepreneur' ? "/entrepreneur-chat" : "/messages" },
       { icon: User, label: "Profile", path: "/profile" }
     ];
     return baseItems;

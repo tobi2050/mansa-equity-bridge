@@ -72,33 +72,33 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
             </CardContent>
           </Card>
 
-          {/* Quick stats */}
+          {/* Quick stats - Updated for multiple businesses */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6 text-center">
                 <Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">1</div>
-                <div className="text-xs text-gray-600">Active Business</div>
+                <div className="text-2xl font-bold text-blue-600">3</div>
+                <div className="text-xs text-gray-600">Active Businesses</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-600">$12.5K</div>
-                <div className="text-xs text-gray-600">Funding Raised</div>
+                <div className="text-2xl font-bold text-green-600">$45.8K</div>
+                <div className="text-xs text-gray-600">Total Funding Raised</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-600">8</div>
-                <div className="text-xs text-gray-600">Investors</div>
+                <div className="text-2xl font-bold text-purple-600">24</div>
+                <div className="text-xs text-gray-600">Total Investors</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <Target className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-amber-600">3/5</div>
+                <div className="text-2xl font-bold text-amber-600">8/15</div>
                 <div className="text-xs text-gray-600">Milestones</div>
               </CardContent>
             </Card>
@@ -117,23 +117,23 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                   onClick={() => setCurrentView('entrepreneur-dashboard')}
                 >
                   <Building2 className="w-6 h-6" />
-                  <span className="text-xs">Manage Business</span>
+                  <span className="text-xs">Manage Businesses</span>
                 </Button>
                 <Button 
                   variant="outline" 
                   className="h-20 flex flex-col gap-2"
-                  onClick={() => navigate('/funding-opportunities')}
+                  onClick={() => navigate('/entrepreneur-projects')}
                 >
                   <DollarSign className="w-6 h-6" />
-                  <span className="text-xs">Request Funding</span>
+                  <span className="text-xs">View Projects</span>
                 </Button>
                 <Button 
                   variant="outline" 
                   className="h-20 flex flex-col gap-2"
-                  onClick={() => navigate('/messages')}
+                  onClick={() => navigate('/entrepreneur-chat')}
                 >
                   <MessageCircle className="w-6 h-6" />
-                  <span className="text-xs">Messages</span>
+                  <span className="text-xs">Chat</span>
                 </Button>
                 <Button 
                   variant="outline" 

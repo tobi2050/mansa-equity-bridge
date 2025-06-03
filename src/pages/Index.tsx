@@ -12,6 +12,7 @@ import AdminDashboard from "@/components/AdminDashboard";
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState("role-selection");
+  const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | undefined>(undefined);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -36,11 +37,13 @@ const Index = () => {
 
   const handleGetStarted = () => {
     setAuthModalTab("role-selection");
+    setAuthModalDefaultRole('investor'); // Highlight investor for "Start Investing Today"
     setShowAuthModal(true);
   };
 
   const handleSignIn = () => {
-    setAuthModalTab("role-selection");
+    setAuthModalTab("sign-in"); // Go directly to sign-in tab
+    setAuthModalDefaultRole(undefined);
     setShowAuthModal(true);
   };
 
@@ -319,6 +322,7 @@ const Index = () => {
         onClose={() => setShowAuthModal(false)}
         onLogin={handleLogin}
         defaultTab={authModalTab}
+        defaultRole={authModalDefaultRole}
       />
       
       {showAdminLogin && (

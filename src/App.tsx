@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Feed from "./pages/Feed";
 import CompleteProfilePage from "./pages/CompleteProfilePage";
+import EntrepreneurProjects from "./pages/EntrepreneurProjects";
+import EntrepreneurCreate from "./pages/EntrepreneurCreate";
+import EntrepreneurChat from "./pages/EntrepreneurChat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/complete-profile" element={<CompleteProfilePage />} />
+          <Route path="/entrepreneur-projects" element={<EntrepreneurProjects />} />
+          <Route path="/entrepreneur-create" element={<EntrepreneurCreate />} />
+          <Route path="/entrepreneur-chat" element={<EntrepreneurChat />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

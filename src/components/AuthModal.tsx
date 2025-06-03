@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Users, BookOpen, User } from "lucide-react";
 import SignUpForm from "./SignUpForm";
 
@@ -14,10 +15,11 @@ interface AuthModalProps {
   onClose: () => void;
   onLogin: (role: 'investor' | 'entrepreneur' | 'philanthropist') => void;
   defaultTab?: string;
+  defaultRole?: 'investor' | 'entrepreneur' | 'philanthropist';
 }
 
-const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection" }: AuthModalProps) => {
-  const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(null);
+const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", defaultRole }: AuthModalProps) => {
+  const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(defaultRole || null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -44,6 +46,10 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection" }: 
     }
   };
 
+  const handleDirectSignIn = () => {
+    setCurrentTab("sign-in");
+  };
+
   if (showSignUpForm && selectedRole) {
     return (
       <SignUpForm
@@ -63,13 +69,16 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection" }: 
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
-            {currentTab === "role-selection" ? "Choose Your Role" : (isSignUp ? "Join MANSA" : "Welcome Back")}
+            {currentTab === "role-selection" ? "Choose Your Role" : 
+             currentTab === "sign-in" ? "Sign In" :
+             (isSignUp ? "Join MANSA" : "Welcome Back")}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="role-selection">Choose Your Role</TabsTrigger>
+            <TabsTrigger value="sign-in">Sign In</TabsTrigger>
             <TabsTrigger value="auth" disabled={!selectedRole}>
               {isSignUp ? "Sign Up" : "Sign In"}
             </TabsTrigger>
@@ -186,6 +195,75 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection" }: 
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="sign-in" className="space-y-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-semibold mb-2">Sign In to Your Account</h3>
+              <p className="text-gray-600">Choose your role and sign in</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+              <div>
+                <Label htmlFor="role">I am signing in as:</Label>
+                <RadioGroup value={selectedRole || ''} onValueChange={(value) => setSelectedRole(value as 'investor' | 'entrepreneur' | 'philanthropist')}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="investor" id="investor" />
+                    <Label htmlFor="investor">Investor</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="entrepreneur" id="entrepreneur" />
+                    <Label htmlFor="entrepreneur">Entrepreneur</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="philanthropist" id="philanthropist" />
+                    <Label htmlFor="philanthropist">Philanthropist</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Enter your email"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                disabled={!selectedRole}
+              >
+                Sign In
+              </Button>
+            </form>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setCurrentTab("role-selection")}
+                className="text-amber-600 hover:text-amber-700 text-sm"
+              >
+                Don't have an account? Sign up
+              </button>
+            </div>
           </TabsContent>
 
           <TabsContent value="auth" className="space-y-6">
