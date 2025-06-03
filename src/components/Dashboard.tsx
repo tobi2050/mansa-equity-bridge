@@ -30,11 +30,18 @@ interface DashboardProps {
 const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('dashboard');
+  const [entrepreneurActiveTab, setEntrepreneurActiveTab] = useState('overview');
 
   const renderCurrentView = () => {
     switch (currentView) {
       case 'entrepreneur-dashboard':
-        return <EntrepreneurDashboard onBack={() => setCurrentView('dashboard')} />;
+        return (
+          <EntrepreneurDashboard 
+            activeTab={entrepreneurActiveTab}
+            setActiveTab={setEntrepreneurActiveTab}
+            onBack={() => setCurrentView('dashboard')} 
+          />
+        );
       case 'investment-opportunities':
         return <InvestmentOpportunities onBack={() => setCurrentView('dashboard')} />;
       default:
