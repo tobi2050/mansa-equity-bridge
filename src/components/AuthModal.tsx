@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,18 +7,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, User } from "lucide-react";
+import SignUpForm from "./SignUpForm";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (role: 'investor' | 'entrepreneur' | 'philanthropist') => void;
+  defaultTab?: string;
 }
 
-const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection" }: AuthModalProps) => {
   const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showSignUpForm, setShowSignUpForm] = useState(false);
+  const [currentTab, setCurrentTab] = useState(defaultTab);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,16 +31,43 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
     }
   };
 
+  const handleContinueToSignUp = () => {
+    if (selectedRole) {
+      setShowSignUpForm(true);
+    }
+  };
+
+  const handleContinueToSignIn = () => {
+    if (selectedRole) {
+      setCurrentTab("auth");
+      setIsSignUp(false);
+    }
+  };
+
+  if (showSignUpForm && selectedRole) {
+    return (
+      <SignUpForm
+        isOpen={isOpen}
+        onClose={() => {
+          setShowSignUpForm(false);
+          onClose();
+        }}
+        selectedRole={selectedRole}
+        onSignUp={onLogin}
+      />
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
-            {isSignUp ? "Join MANSA" : "Welcome to MANSA"}
+            {currentTab === "role-selection" ? "Choose Your Role" : (isSignUp ? "Join MANSA" : "Welcome Back")}
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="role-selection" className="w-full">
+        <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="role-selection">Choose Your Role</TabsTrigger>
             <TabsTrigger value="auth" disabled={!selectedRole}>
@@ -138,16 +168,22 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
             </div>
 
             {selectedRole && (
-              <div className="text-center">
-                <Button 
-                  onClick={() => {
-                    const tabsList = document.querySelector('[value="auth"]') as HTMLElement;
-                    tabsList?.click();
-                  }}
-                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                >
-                  Continue as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
-                </Button>
+              <div className="text-center space-y-3">
+                <div className="flex gap-3 justify-center">
+                  <Button 
+                    onClick={handleContinueToSignUp}
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                  >
+                    Sign Up as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={handleContinueToSignIn}
+                    className="border-amber-500 text-amber-700 hover:bg-amber-50"
+                  >
+                    Sign In
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -158,7 +194,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
                 {isSignUp ? "Create Your Account" : "Sign In to Your Account"}
               </h3>
               <p className="text-gray-600">
-                You're joining as a <Badge className="bg-amber-100 text-amber-800">{selectedRole}</Badge>
+                You're signing in as a <Badge className="bg-amber-100 text-amber-800">{selectedRole}</Badge>
               </p>
             </div>
 
@@ -191,17 +227,17 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
                 type="submit" 
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
               >
-                {isSignUp ? "Create Account" : "Sign In"}
+                Sign In
               </Button>
             </form>
 
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => setShowSignUpForm(true)}
                 className="text-amber-600 hover:text-amber-700 text-sm"
               >
-                {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+                Don't have an account? Sign up
               </button>
             </div>
           </TabsContent>

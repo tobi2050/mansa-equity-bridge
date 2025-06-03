@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +18,9 @@ import {
   Edit,
   Share2,
   MessageCircle,
-  Star
+  Star,
+  ArrowLeft,
+  Home
 } from "lucide-react";
 
 interface UserProfileProps {
@@ -26,7 +29,8 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(userRole === 'investor' ? "overview" : "activity");
   const [isFollowing, setIsFollowing] = useState(false);
 
   const profileData = {
@@ -56,7 +60,28 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
+      {/* Header with Navigation */}
+      <div className="bg-white border-b px-4 py-4 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+              <Home className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/feed')}>
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Feed
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Header */}
       <div className="bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -120,60 +145,89 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
       <div className="max-w-4xl mx-auto px-4 -mt-4">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 bg-white border">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            {userRole === 'investor' && <TabsTrigger value="overview">Overview</TabsTrigger>}
             <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="portfolio">{userRole === 'entrepreneur' ? 'Businesses' : 'Investments'}</TabsTrigger>
             <TabsTrigger value="reviews" className="hidden md:block">Reviews</TabsTrigger>
           </TabsList>
 
           <div className="mt-6 space-y-6">
-            <TabsContent value="overview" className="space-y-6">
-              {/* Profile Completion */}
-              {isOwnProfile && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      Profile Completion
-                      <span className="text-sm font-normal">{profileData.completionPercentage}%</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Progress value={profileData.completionPercentage} className="mb-2" />
-                    <p className="text-sm text-gray-600">
-                      {profileData.completionPercentage < 80 
-                        ? "Complete your profile to unlock all features" 
-                        : "Great! Your profile is ready for business"}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(profileData.stats).map(([key, value]) => (
-                  <Card key={key}>
-                    <CardContent className="pt-6 text-center">
-                      <div className="text-2xl font-bold text-amber-600">{value}</div>
-                      <div className="text-xs text-gray-600 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </div>
+            {userRole === 'investor' && (
+              <TabsContent value="overview" className="space-y-6">
+                {/* Profile Completion */}
+                {isOwnProfile && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        Profile Completion
+                        <span className="text-sm font-normal">{profileData.completionPercentage}%</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Progress value={profileData.completionPercentage} className="mb-2" />
+                      <p className="text-sm text-gray-600">
+                        {profileData.completionPercentage < 80 
+                          ? "Complete your profile to unlock all features" 
+                          : "Great! Your profile is ready for business"}
+                      </p>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
+                )}
 
-              {/* Bio */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>About</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700">{profileData.bio}</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {Object.entries(profileData.stats).map(([key, value]) => (
+                    <Card key={key}>
+                      <CardContent className="pt-6 text-center">
+                        <div className="text-2xl font-bold text-amber-600">{value}</div>
+                        <div className="text-xs text-gray-600 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Bio */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>About</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">{profileData.bio}</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
 
             <TabsContent value="activity" className="space-y-4">
+              {/* Show stats for non-investor profiles */}
+              {userRole !== 'investor' && (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {Object.entries(profileData.stats).map(([key, value]) => (
+                      <Card key={key}>
+                        <CardContent className="pt-6 text-center">
+                          <div className="text-2xl font-bold text-amber-600">{value}</div>
+                          <div className="text-xs text-gray-600 capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>About</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700">{profileData.bio}</p>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>

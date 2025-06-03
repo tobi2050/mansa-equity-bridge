@@ -11,6 +11,7 @@ import AdminDashboard from "@/components/AdminDashboard";
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState("role-selection");
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -31,6 +32,16 @@ const Index = () => {
     setIsLoggedIn(false);
     setIsAdmin(false);
     setUserRole(null);
+  };
+
+  const handleGetStarted = () => {
+    setAuthModalTab("role-selection");
+    setShowAuthModal(true);
+  };
+
+  const handleSignIn = () => {
+    setAuthModalTab("role-selection");
+    setShowAuthModal(true);
   };
 
   // Secret admin access - triple click on logo
@@ -55,7 +66,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       {/* Header */}
-      <header className="px-4 py-4 bg-white/90 backdrop-blur-sm border-b border-amber-200 sticky top-0 z-40">
+      <header className="px-4 py-4 bg-white/95 backdrop-blur-sm border-b border-amber-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3" onClick={handleLogoClick}>
             <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center cursor-pointer">
@@ -69,13 +80,13 @@ const Index = () => {
           <div className="flex items-center space-x-3">
             <Button 
               variant="outline"
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleSignIn}
               className="border-amber-500 text-amber-700 hover:bg-amber-50"
             >
               Sign In
             </Button>
             <Button 
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
             >
               Get Started
@@ -100,7 +111,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-lg"
             >
               Start Investing Today
@@ -108,7 +119,7 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStarted}
               className="border-amber-500 text-amber-700 hover:bg-amber-50 px-8 py-4 text-lg"
             >
               List Your Business
@@ -246,7 +257,7 @@ const Index = () => {
           </p>
           <Button 
             size="lg"
-            onClick={() => setShowAuthModal(true)}
+            onClick={handleGetStarted}
             className="bg-white text-amber-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold"
           >
             Join MANSA Today
@@ -307,6 +318,7 @@ const Index = () => {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
         onLogin={handleLogin}
+        defaultTab={authModalTab}
       />
       
       {showAdminLogin && (

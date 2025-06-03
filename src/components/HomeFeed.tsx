@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,9 @@ import {
   Send,
   TrendingUp,
   Users,
-  Bookmark
+  Bookmark,
+  ArrowLeft,
+  Home
 } from "lucide-react";
 
 interface HomeFeedProps {
@@ -22,6 +25,7 @@ interface HomeFeedProps {
 }
 
 const HomeFeed = ({ userRole }: HomeFeedProps) => {
+  const navigate = useNavigate();
   const [newPost, setNewPost] = useState("");
   const [posts, setPosts] = useState([
     {
@@ -100,11 +104,27 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
+      {/* Header with Navigation */}
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-xl font-bold text-gray-900">Home Feed</h1>
-          <p className="text-sm text-gray-600">Stay updated with your network</p>
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Home Feed</h1>
+              <p className="text-sm text-gray-600">Stay updated with your network</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+              <Home className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+              <Users className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+          </div>
         </div>
       </div>
 
