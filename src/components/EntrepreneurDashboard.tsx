@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,9 +27,10 @@ import MilestoneTracking from "@/components/MilestoneTracking";
 interface EntrepreneurDashboardProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onBack?: () => void;
 }
 
-const EntrepreneurDashboard = ({ activeTab, setActiveTab }: EntrepreneurDashboardProps) => {
+const EntrepreneurDashboard = ({ activeTab, setActiveTab, onBack }: EntrepreneurDashboardProps) => {
   const profileCompletion = 75;
   const navigate = useNavigate();
   
