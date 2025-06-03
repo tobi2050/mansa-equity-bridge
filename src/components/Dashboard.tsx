@@ -19,11 +19,15 @@ import {
   DollarSign,
   Target,
   Bell,
-  Settings
+  Settings,
+  Home,
+  Plus
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import InvestmentOpportunities from "@/components/InvestmentOpportunities";
 import BusinessListings from "@/components/BusinessListings";
 import EntrepreneurDashboard from "@/components/EntrepreneurDashboard";
+import CreatePost from "@/components/CreatePost";
 
 interface DashboardProps {
   userRole: 'investor' | 'entrepreneur' | 'philanthropist';
@@ -32,6 +36,8 @@ interface DashboardProps {
 
 const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const navigate = useNavigate();
 
   const getRoleIcon = () => {
     switch (userRole) {
@@ -75,6 +81,8 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
           
           <div className="flex-1 overflow-y-auto">
             <nav className="p-2 space-y-1">
+              <NavItem icon={<Home className="h-4 w-4" />} label="Home Feed" onClick={() => navigate('/feed')} />
+              <NavItem icon={<User className="h-4 w-4" />} label="My Profile" onClick={() => navigate('/profile')} />
               {userRole === 'entrepreneur' ? (
                 <>
                   <NavItem icon={<TrendingUp className="h-4 w-4" />} label="Dashboard" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} />
@@ -90,7 +98,6 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                   <NavItem icon={<TrendingUp className="h-4 w-4" />} label="Dashboard" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} />
                   <NavItem icon={<BookOpen className="h-4 w-4" />} label="Opportunities" onClick={() => setActiveTab("opportunities")} />
                   <NavItem icon={<MessageSquare className="h-4 w-4" />} label="Activity" onClick={() => setActiveTab("activity")} />
-                  <NavItem icon={<User className="h-4 w-4" />} label="Profile" onClick={() => setActiveTab("profile")} />
                 </>
               )}
               <NavItem icon={<Settings className="h-4 w-4" />} label="Settings" onClick={() => setActiveTab("settings")} />
@@ -143,12 +150,20 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
           </div>
           
           <div className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowCreatePost(true)}
+              className="text-amber-600 hover:bg-amber-50"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-4 w-4" />
               <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
             </Button>
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">JD</AvatarFallback>
+            <Avatar className="h-8 w-8" onClick={() => navigate('/profile')}>
+              <AvatarFallback className="text-xs cursor-pointer">JD</AvatarFallback>
             </Avatar>
           </div>
         </div>
@@ -353,6 +368,13 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
           </Tabs>
         )}
       </div>
+
+      {showCreatePost && (
+        <CreatePost 
+          userRole={userRole}
+          onClose={() => setShowCreatePost(false)}
+        />
+      )}
     </div>
   );
 };
