@@ -179,7 +179,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                     onClick={() => setCurrentTab("sign-in")}
                     className="border-amber-500 text-amber-700 hover:bg-amber-50"
                   >
-                    Sign In
+                    Already have an account?
                   </Button>
                 </div>
               </div>
