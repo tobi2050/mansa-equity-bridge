@@ -1,27 +1,36 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, CheckCircle, Shield } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
-import Dashboard from "@/components/Dashboard";
 import AdminLogin from "@/components/AdminLogin";
 import AdminDashboard from "@/components/AdminDashboard";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { authState, login, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState("role-selection");
   const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | undefined>(undefined);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userRole, setUserRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(null);
+
+  // Redirect to dashboard if already authenticated
+  if (authState.isAuthenticated && !isAdmin) {
+    const dashboardPath = authState.userRole === 'entrepreneur' ? '/entrepreneur-dashboard' : '/dashboard';
+    navigate(dashboardPath);
+    return null;
+  }
 
   const handleLogin = (role: 'investor' | 'entrepreneur' | 'philanthropist') => {
-    setUserRole(role);
-    setIsLoggedIn(true);
+    login(role);
     setShowAuthModal(false);
+    const dashboardPath = role === 'entrepreneur' ? '/entrepreneur-dashboard' : '/dashboard';
+    navigate(dashboardPath);
   };
 
   const handleAdminLogin = () => {
@@ -30,20 +39,19 @@ const Index = () => {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
     setIsAdmin(false);
-    setUserRole(null);
   };
 
   const handleGetStarted = () => {
     setAuthModalTab("role-selection");
-    setAuthModalDefaultRole('investor'); // Highlight investor for "Start Investing Today"
+    setAuthModalDefaultRole('investor'); // Pre-select investor for "Start Investing Today"
     setShowAuthModal(true);
   };
 
   const handleListBusiness = () => {
     setAuthModalTab("role-selection");
-    setAuthModalDefaultRole('entrepreneur'); // Highlight entrepreneur for "List Your Business"
+    setAuthModalDefaultRole('entrepreneur'); // Pre-select entrepreneur for "List Your Business"
     setShowAuthModal(true);
   };
 
@@ -66,10 +74,6 @@ const Index = () => {
 
   if (isAdmin) {
     return <AdminDashboard onLogout={handleLogout} />;
-  }
-
-  if (isLoggedIn && userRole) {
-    return <Dashboard userRole={userRole} onLogout={handleLogout} />;
   }
 
   return (
