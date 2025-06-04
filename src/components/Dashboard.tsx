@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,9 +162,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
               <TabsTrigger value="overview" className="text-xs md:text-sm">Overview</TabsTrigger>
-              <TabsTrigger value="opportunities" className="text-xs md:text-sm">
-                {userRole === 'entrepreneur' ? 'My Businesses' : 'Opportunities'}
-              </TabsTrigger>
+              <TabsTrigger value="opportunities" className="text-xs md:text-sm">Opportunities</TabsTrigger>
               <TabsTrigger value="activity" className="text-xs md:text-sm">Activity</TabsTrigger>
               <TabsTrigger value="profile" className="text-xs md:text-sm">Profile</TabsTrigger>
             </TabsList>
@@ -173,8 +172,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Total Invested' : 
-                       userRole === 'entrepreneur' ? 'Total Raised' : 'Total Donated'}
+                      {userRole === 'investor' ? 'Total Invested' : 'Total Donated'}
                     </CardTitle>
                     <span className="text-xl md:text-2xl font-bold text-amber-600">$2,340</span>
                   </CardHeader>
@@ -188,8 +186,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Active Investments' : 
-                       userRole === 'entrepreneur' ? 'Active Listings' : 'Supported Businesses'}
+                      {userRole === 'investor' ? 'Active Investments' : 'Supported Businesses'}
                     </CardTitle>
                     <span className="text-xl md:text-2xl font-bold text-amber-600">12</span>
                   </CardHeader>
@@ -203,8 +200,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Portfolio Value' : 
-                       userRole === 'entrepreneur' ? 'Business Value' : 'Impact Score'}
+                      {userRole === 'investor' ? 'Portfolio Value' : 'Impact Score'}
                     </CardTitle>
                     <span className="text-xl md:text-2xl font-bold text-amber-600">
                       {userRole === 'philanthropist' ? '8.5/10' : '$5,760'}
@@ -229,9 +225,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">
-                        {userRole === 'investor' ? 'Investment in TechStart Africa' : 
-                         userRole === 'entrepreneur' ? 'New bid received from Investor Consortium' : 
-                         'Donation to Solar Energy Project'}
+                        {userRole === 'investor' ? 'Investment in TechStart Africa' : 'Donation to Solar Energy Project'}
                       </p>
                       <p className="text-xs text-gray-500">2 hours ago</p>
                     </div>
@@ -253,8 +247,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                     <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">
-                        {userRole === 'investor' ? 'Joined consortium for Manufacturing Co.' : 
-                         'Profile verification completed'}
+                        {userRole === 'investor' ? 'Joined consortium for Manufacturing Co.' : 'Profile verification completed'}
                       </p>
                       <p className="text-xs text-gray-500">3 days ago</p>
                     </div>
@@ -264,11 +257,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
             </TabsContent>
 
             <TabsContent value="opportunities" className="space-y-4 md:space-y-6">
-              {userRole === 'entrepreneur' ? (
-                <BusinessListings />
-              ) : (
-                <InvestmentOpportunities userRole={userRole} />
-              )}
+              <InvestmentOpportunities userRole={userRole} />
             </TabsContent>
 
             <TabsContent value="activity" className="space-y-4 md:space-y-6">
