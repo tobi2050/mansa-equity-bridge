@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,19 +8,17 @@ import AuthModal from "@/components/AuthModal";
 import Dashboard from "@/components/Dashboard";
 import AdminLogin from "@/components/AdminLogin";
 import AdminDashboard from "@/components/AdminDashboard";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { authState, logout, isLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState("role-selection");
   const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | undefined>(undefined);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userRole, setUserRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(null);
 
   const handleLogin = (role: 'investor' | 'entrepreneur' | 'philanthropist') => {
-    setUserRole(role);
-    setIsLoggedIn(true);
     setShowAuthModal(false);
   };
 
@@ -30,20 +28,19 @@ const Index = () => {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
     setIsAdmin(false);
-    setUserRole(null);
   };
 
   const handleGetStarted = () => {
     setAuthModalTab("role-selection");
-    setAuthModalDefaultRole('investor'); // Highlight investor for "Start Investing Today"
+    setAuthModalDefaultRole('investor'); // Pre-select investor for "Start Investing Today"
     setShowAuthModal(true);
   };
 
   const handleListBusiness = () => {
     setAuthModalTab("role-selection");
-    setAuthModalDefaultRole('entrepreneur'); // Highlight entrepreneur for "List Your Business"
+    setAuthModalDefaultRole('entrepreneur'); // Pre-select entrepreneur for "List Your Business"
     setShowAuthModal(true);
   };
 
@@ -64,12 +61,26 @@ const Index = () => {
     setTimeout(() => setLogoClickCount(0), 2000);
   };
 
+  // Show loading while checking auth state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span className="text-white font-bold text-lg">M</span>
+          </div>
+          <p className="text-gray-600">Loading MANSA...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isAdmin) {
     return <AdminDashboard onLogout={handleLogout} />;
   }
 
-  if (isLoggedIn && userRole) {
-    return <Dashboard userRole={userRole} onLogout={handleLogout} />;
+  if (authState.isAuthenticated && authState.userRole) {
+    return <Dashboard userRole={authState.userRole} onLogout={handleLogout} />;
   }
 
   return (

@@ -2,6 +2,7 @@
 import { Home, Lightbulb, Plus, MessageCircle, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useNavigation } from "@/contexts/NavigationContext";
 
 interface BottomNavigationProps {
   userRole: 'investor' | 'entrepreneur' | 'philanthropist';
@@ -10,14 +11,44 @@ interface BottomNavigationProps {
 const BottomNavigation = ({ userRole }: BottomNavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { navigateTo, currentPage } = useNavigation();
+
+  const handleHomeClick = () => {
+    navigateTo('dashboard');
+  };
 
   const getNavItems = () => {
     const baseItems = [
-      { icon: Home, label: "Dashboard", path: "/" },
-      { icon: Lightbulb, label: "Projects", path: userRole === 'entrepreneur' ? "/entrepreneur-projects" : "/investment-opportunities" },
-      { icon: Plus, label: "Create", path: userRole === 'entrepreneur' ? "/entrepreneur-create" : "/create-post" },
-      { icon: MessageCircle, label: "Chat", path: userRole === 'entrepreneur' ? "/entrepreneur-chat" : "/messages" },
-      { icon: User, label: "Profile", path: "/profile" }
+      { 
+        icon: Home, 
+        label: "Dashboard", 
+        action: handleHomeClick,
+        isActive: currentPage === 'dashboard'
+      },
+      { 
+        icon: Lightbulb, 
+        label: "Projects", 
+        action: () => navigate(userRole === 'entrepreneur' ? "/entrepreneur-projects" : "/investment-opportunities"),
+        isActive: location.pathname === (userRole === 'entrepreneur' ? "/entrepreneur-projects" : "/investment-opportunities")
+      },
+      { 
+        icon: Plus, 
+        label: "Create", 
+        action: () => navigate(userRole === 'entrepreneur' ? "/entrepreneur-create" : "/create-post"),
+        isActive: location.pathname === (userRole === 'entrepreneur' ? "/entrepreneur-create" : "/create-post")
+      },
+      { 
+        icon: MessageCircle, 
+        label: "Chat", 
+        action: () => navigate(userRole === 'entrepreneur' ? "/entrepreneur-chat" : "/messages"),
+        isActive: location.pathname === (userRole === 'entrepreneur' ? "/entrepreneur-chat" : "/messages")
+      },
+      { 
+        icon: User, 
+        label: "Profile", 
+        action: () => navigate("/profile"),
+        isActive: location.pathname === "/profile"
+      }
     ];
     return baseItems;
   };
@@ -29,22 +60,21 @@ const BottomNavigation = ({ userRole }: BottomNavigationProps) => {
       <div className="flex justify-around items-center py-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.path;
           
           return (
             <Button
               key={item.label}
               variant="ghost"
               size="sm"
-              onClick={() => navigate(item.path)}
+              onClick={item.action}
               className={`flex flex-col items-center gap-1 px-2 py-3 ${
-                isActive 
+                item.isActive 
                   ? 'text-amber-600' 
                   : 'text-gray-600'
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-amber-600' : 'text-gray-600'}`} />
-              <span className={`text-xs ${isActive ? 'text-amber-600' : 'text-gray-600'}`}>
+              <Icon className={`w-5 h-5 ${item.isActive ? 'text-amber-600' : 'text-gray-600'}`} />
+              <span className={`text-xs ${item.isActive ? 'text-amber-600' : 'text-gray-600'}`}>
                 {item.label}
               </span>
             </Button>

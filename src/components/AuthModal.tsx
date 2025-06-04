@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Users, BookOpen, User } from "lucide-react";
+import { Users, BookOpen, User, CheckCircle } from "lucide-react";
 import SignUpForm from "./SignUpForm";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,16 +20,24 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", defaultRole }: AuthModalProps) => {
+  const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(defaultRole || null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [currentTab, setCurrentTab] = useState(defaultTab);
+
+  // Update selected role when defaultRole changes
+  useEffect(() => {
+    if (defaultRole) {
+      setSelectedRole(defaultRole);
+    }
+  }, [defaultRole]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedRole) {
+      login(selectedRole);
       onLogin(selectedRole);
     }
   };
@@ -43,7 +51,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
   const handleContinueToSignIn = () => {
     if (selectedRole) {
       setCurrentTab("auth");
-      setIsSignUp(false);
     }
   };
 
@@ -60,7 +67,10 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
           onClose();
         }}
         selectedRole={selectedRole}
-        onSignUp={onLogin}
+        onSignUp={(role) => {
+          login(role);
+          onLogin(role);
+        }}
       />
     );
   }
@@ -77,35 +87,45 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
           <DialogTitle className="text-2xl font-bold text-center text-gray-900">
             {currentTab === "role-selection" ? "Choose Your Role" : 
              currentTab === "sign-in" ? "Sign In to MANSA" :
-             (isSignUp ? "Join MANSA" : "Welcome Back")}
+             "Welcome Back"}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/50">
+          <TabsList className="grid w-full grid-cols-2 bg-white/50">
             <TabsTrigger value="role-selection" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Choose Your Role</TabsTrigger>
             <TabsTrigger value="sign-in" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Sign In</TabsTrigger>
-            <TabsTrigger value="auth" disabled={!selectedRole} className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
-              {isSignUp ? "Sign Up" : "Sign In"}
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="role-selection" className="space-y-6">
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold mb-2 text-gray-900">How would you like to participate?</h3>
               <p className="text-gray-600">Select your primary role on the MANSA platform</p>
+              {defaultRole && (
+                <Badge className="mt-2 bg-amber-100 text-amber-800 border-amber-200">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Pre-selected based on your interest
+                </Badge>
+              )}
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
               <Card 
                 className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
-                  selectedRole === 'investor' ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' : 'border-amber-200 hover:border-amber-300'
-                }`}
+                  selectedRole === 'investor' 
+                    ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' 
+                    : 'border-amber-200 hover:border-amber-300'
+                } ${defaultRole === 'investor' ? 'shadow-lg' : ''}`}
                 onClick={() => setSelectedRole('investor')}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 relative">
                     <Users className="h-8 w-8 text-white" />
+                    {selectedRole === 'investor' && (
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                    )}
                   </div>
                   <CardTitle className="text-amber-800">Investor</CardTitle>
                   <CardDescription>
@@ -127,13 +147,20 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
 
               <Card 
                 className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
-                  selectedRole === 'entrepreneur' ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' : 'border-amber-200 hover:border-amber-300'
-                }`}
+                  selectedRole === 'entrepreneur' 
+                    ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' 
+                    : 'border-amber-200 hover:border-amber-300'
+                } ${defaultRole === 'entrepreneur' ? 'shadow-lg' : ''}`}
                 onClick={() => setSelectedRole('entrepreneur')}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 relative">
                     <BookOpen className="h-8 w-8 text-white" />
+                    {selectedRole === 'entrepreneur' && (
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                    )}
                   </div>
                   <CardTitle className="text-amber-800">Entrepreneur</CardTitle>
                   <CardDescription>
@@ -155,13 +182,20 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
 
               <Card 
                 className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
-                  selectedRole === 'philanthropist' ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' : 'border-amber-200 hover:border-amber-300'
-                }`}
+                  selectedRole === 'philanthropist' 
+                    ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' 
+                    : 'border-amber-200 hover:border-amber-300'
+                } ${defaultRole === 'philanthropist' ? 'shadow-lg' : ''}`}
                 onClick={() => setSelectedRole('philanthropist')}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 relative">
                     <User className="h-8 w-8 text-white" />
+                    {selectedRole === 'philanthropist' && (
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                    )}
                   </div>
                   <CardTitle className="text-amber-800">Philanthropist</CardTitle>
                   <CardDescription>
@@ -272,60 +306,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                 type="button"
                 onClick={() => setCurrentTab("role-selection")}
                 className="text-amber-600 hover:text-amber-700 text-sm font-medium"
-              >
-                Don't have an account? Sign up
-              </button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="auth" className="space-y-6">
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold mb-2">
-                {isSignUp ? "Create Your Account" : "Sign In to Your Account"}
-              </h3>
-              <p className="text-gray-600">
-                You're signing in as a <Badge className="bg-amber-100 text-amber-800">{selectedRole}</Badge>
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="Enter your email"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-              >
-                Sign In
-              </Button>
-            </form>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setShowSignUpForm(true)}
-                className="text-amber-600 hover:text-amber-700 text-sm"
               >
                 Don't have an account? Sign up
               </button>
