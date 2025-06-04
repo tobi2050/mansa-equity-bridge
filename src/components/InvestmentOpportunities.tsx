@@ -4,271 +4,226 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Building2, 
-  MapPin, 
-  Calendar, 
-  DollarSign, 
-  TrendingUp,
-  Users,
-  Filter,
-  Search,
-  ArrowLeft,
-  MessageCircle
-} from "lucide-react";
-import BidDetails from "./BidDetails";
+import { Users, Calendar, BookOpen } from "lucide-react";
 
 interface InvestmentOpportunitiesProps {
-  onBack?: () => void;
+  userRole: 'investor' | 'philanthropist';
 }
 
-const InvestmentOpportunities = ({ onBack }: InvestmentOpportunitiesProps) => {
+const InvestmentOpportunities = ({ userRole }: InvestmentOpportunitiesProps) => {
+  const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState("");
-  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
-  const [showBidDetails, setShowBidDetails] = useState(false);
 
   const opportunities = [
     {
       id: 1,
-      title: "EcoFarm Nigeria",
-      description: "Sustainable agriculture solutions for small-scale farmers in West Africa",
-      industry: "Agriculture",
+      title: "EcoFarm Nigeria - Organic Agriculture",
+      description: "Sustainable farming initiative connecting rural farmers with urban markets through organic certification and digital marketplace.",
+      stage: "Scaling",
+      fundingGoal: 75000,
+      currentFunding: 45000,
       location: "Lagos, Nigeria",
-      fundingGoal: 50000,
-      raised: 32500,
-      daysLeft: 15,
-      entrepreneur: "Adaora Okwu",
-      equity: "15%",
+      category: "Agriculture",
+      equityOffered: 15,
+      minimumInvestment: 1000,
       bidders: 8,
-      comments: 12,
-      milestones: { completed: 3, total: 5 },
-      image: "agriculture",
-      featured: true
+      timeLeft: "12 days",
+      milestones: 5,
+      completedMilestones: 3,
+      entrepreneur: {
+        name: "Amara Okafor",
+        initials: "AO"
+      }
     },
     {
       id: 2,
-      title: "TechHub Accra",
-      description: "Co-working space and incubator for tech startups in Ghana",
-      industry: "Technology",
+      title: "Solar Tech Ghana - Clean Energy Solutions",
+      description: "Manufacturing affordable solar panels for rural communities while creating local jobs and reducing energy poverty.",
+      stage: "MVP",
+      fundingGoal: 50000,
+      currentFunding: 15000,
       location: "Accra, Ghana",
-      fundingGoal: 75000,
-      raised: 18500,
-      daysLeft: 22,
-      entrepreneur: "Kwame Asante",
-      equity: "12%",
-      bidders: 5,
-      comments: 8,
-      milestones: { completed: 2, total: 4 },
-      image: "technology",
-      featured: false
+      category: "Energy",
+      equityOffered: 20,
+      minimumInvestment: 500,
+      bidders: 12,
+      timeLeft: "8 days",
+      milestones: 5,
+      completedMilestones: 2,
+      entrepreneur: {
+        name: "Kwame Asante",
+        initials: "KA"
+      }
     },
     {
       id: 3,
-      title: "Solar Solutions Kenya",
-      description: "Affordable solar energy systems for rural communities",
-      industry: "Energy",
+      title: "FinTech Kenya - Mobile Banking for SMEs",
+      description: "Digital banking platform specifically designed for small and medium enterprises across East Africa.",
+      stage: "Prototype",
+      fundingGoal: 100000,
+      currentFunding: 35000,
       location: "Nairobi, Kenya",
-      fundingGoal: 40000,
-      raised: 28000,
-      daysLeft: 8,
-      entrepreneur: "Maria Wanjiku",
-      equity: "18%",
-      bidders: 12,
-      comments: 15,
-      milestones: { completed: 4, total: 5 },
-      image: "energy",
-      featured: true
+      category: "FinTech",
+      equityOffered: 12,
+      minimumInvestment: 750,
+      bidders: 15,
+      timeLeft: "15 days",
+      milestones: 5,
+      completedMilestones: 1,
+      entrepreneur: {
+        name: "Grace Wanjiku",
+        initials: "GW"
+      }
     }
   ];
 
-  const handleViewDetails = (opportunity: any) => {
-    setSelectedOpportunity(opportunity);
-    setShowBidDetails(true);
+  const getStageColor = (stage: string) => {
+    switch (stage) {
+      case 'Idea': return 'bg-gray-100 text-gray-800';
+      case 'Prototype': return 'bg-blue-100 text-blue-800';
+      case 'MVP': return 'bg-yellow-100 text-yellow-800';
+      case 'Scaling': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         opp.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesIndustry = selectedIndustry === "" || opp.industry === selectedIndustry;
-    return matchesSearch && matchesIndustry;
+                         opp.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         opp.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filter === "all" || opp.category.toLowerCase() === filter;
+    return matchesSearch && matchesFilter;
   });
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {onBack && (
-            <Button variant="ghost" size="sm" onClick={onBack}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Investment Opportunities</h1>
-            <p className="text-gray-600">Discover and invest in African businesses</p>
-          </div>
-        </div>
-        <Badge variant="outline" className="text-green-600 border-green-200">
-          {filteredOpportunities.length} opportunities
-        </Badge>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Input
+          placeholder="Search opportunities..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1"
+        />
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Filter by category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="agriculture">Agriculture</SelectItem>
+            <SelectItem value="energy">Energy</SelectItem>
+            <SelectItem value="fintech">FinTech</SelectItem>
+            <SelectItem value="healthcare">Healthcare</SelectItem>
+            <SelectItem value="education">Education</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
-              <Input
-                placeholder="Search opportunities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="All Industries" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Industries</SelectItem>
-                <SelectItem value="Agriculture">Agriculture</SelectItem>
-                <SelectItem value="Technology">Technology</SelectItem>
-                <SelectItem value="Energy">Energy</SelectItem>
-                <SelectItem value="Healthcare">Healthcare</SelectItem>
-                <SelectItem value="Education">Education</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Opportunities Grid */}
       <div className="grid gap-6">
         {filteredOpportunities.map((opportunity) => (
-          <Card key={opportunity.id} className={`hover:shadow-lg transition-shadow ${opportunity.featured ? 'ring-2 ring-amber-200' : ''}`}>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* Left: Business Image */}
-                <div className="space-y-4">
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="w-12 h-12 text-blue-600" />
+          <Card key={opportunity.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar>
+                      <AvatarFallback>{opportunity.entrepreneur.initials}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle className="text-lg">{opportunity.title}</CardTitle>
+                      <p className="text-sm text-gray-600">{opportunity.entrepreneur.name}</p>
+                    </div>
                   </div>
-                  {opportunity.featured && (
-                    <Badge className="bg-amber-100 text-amber-800">Featured</Badge>
-                  )}
+                  <CardDescription className="text-base">
+                    {opportunity.description}
+                  </CardDescription>
                 </div>
-
-                {/* Middle: Details */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{opportunity.title}</h3>
-                    <p className="text-gray-600 mb-3">{opportunity.description}</p>
-                    
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <Building2 className="w-4 h-4" />
-                        {opportunity.industry}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {opportunity.location}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {opportunity.daysLeft} days left
-                      </span>
-                    </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge className={getStageColor(opportunity.stage)}>
+                    {opportunity.stage}
+                  </Badge>
+                  <Badge variant="outline">
+                    {opportunity.category}
+                  </Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Funding Progress</span>
+                    <span className="font-medium">
+                      ${opportunity.currentFunding.toLocaleString()} / ${opportunity.fundingGoal.toLocaleString()}
+                    </span>
                   </div>
-
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Funding Progress</span>
-                      <span className="font-medium">
-                        ${opportunity.raised.toLocaleString()} / ${opportunity.fundingGoal.toLocaleString()}
-                      </span>
-                    </div>
-                    <Progress value={(opportunity.raised / opportunity.fundingGoal) * 100} className="h-2" />
+                  <Progress 
+                    value={(opportunity.currentFunding / opportunity.fundingGoal) * 100} 
+                    className="h-2"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Milestones</span>
+                    <span className="font-medium">
+                      {opportunity.completedMilestones} / {opportunity.milestones}
+                    </span>
                   </div>
+                  <Progress 
+                    value={(opportunity.completedMilestones / opportunity.milestones) * 100} 
+                    className="h-2"
+                  />
+                </div>
+              </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {opportunity.bidders} bidders
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MessageCircle className="w-4 h-4" />
-                        {opportunity.comments} comments
-                      </span>
-                    </div>
-                    <span className="text-green-600 font-medium">{opportunity.equity} equity offered</span>
+              <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Location:</span>
+                  <p className="font-medium">{opportunity.location}</p>
+                </div>
+                {userRole === 'investor' && (
+                  <div>
+                    <span className="text-gray-600">Equity Offered:</span>
+                    <p className="font-medium">{opportunity.equityOffered}%</p>
+                  </div>
+                )}
+                <div>
+                  <span className="text-gray-600">Min. {userRole === 'investor' ? 'Investment' : 'Donation'}:</span>
+                  <p className="font-medium">${opportunity.minimumInvestment}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t">
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    <span>{opportunity.bidders} {userRole === 'investor' ? 'bidders' : 'supporters'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{opportunity.timeLeft} left</span>
                   </div>
                 </div>
-
-                {/* Right: Actions */}
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <div className="text-center mb-3">
-                      <div className="text-2xl font-bold text-green-600">
-                        ${opportunity.fundingGoal.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-gray-600">Funding Goal</div>
-                    </div>
-                    
-                    <div className="text-center mb-3">
-                      <div className="text-lg font-semibold text-blue-600">{opportunity.equity}</div>
-                      <div className="text-sm text-gray-600">Equity Offered</div>
-                    </div>
-
-                    <div className="text-center mb-4">
-                      <div className="text-sm text-gray-600">
-                        Milestone Progress: {opportunity.milestones.completed}/{opportunity.milestones.total}
-                      </div>
-                      <Progress 
-                        value={(opportunity.milestones.completed / opportunity.milestones.total) * 100} 
-                        className="h-1 mt-1" 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Button 
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
-                      onClick={() => handleViewDetails(opportunity)}
-                    >
-                      View Details & Bid
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Save Opportunity
-                    </Button>
-                  </div>
-
-                  <div className="text-center">
-                    <p className="text-xs text-gray-500">by {opportunity.entrepreneur}</p>
-                  </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <BookOpen className="h-4 w-4 mr-1" />
+                    View Details
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                  >
+                    {userRole === 'investor' ? 'Place Bid' : 'Support'}
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* Bid Details Modal */}
-      {showBidDetails && selectedOpportunity && (
-        <BidDetails
-          isOpen={showBidDetails}
-          onClose={() => setShowBidDetails(false)}
-          opportunity={selectedOpportunity}
-        />
-      )}
     </div>
   );
 };
