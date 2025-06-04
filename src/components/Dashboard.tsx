@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,36 +11,26 @@ import {
   Users, 
   Building2, 
   Target,
+  Calendar,
   MessageCircle,
   Bell,
-  Home
+  ChevronRight,
+  ArrowLeft
 } from "lucide-react";
 import EntrepreneurDashboard from "./EntrepreneurDashboard";
 import InvestmentOpportunities from "./InvestmentOpportunities";
 import SlideOutMenu from "./SlideOutMenu";
 import BottomNavigation from "./BottomNavigation";
-import { useAuth } from "@/contexts/AuthContext";
 
-const Dashboard = () => {
+interface DashboardProps {
+  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  onLogout: () => void;
+}
+
+const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
   const navigate = useNavigate();
-  const { authState, logout, updateActivity } = useAuth();
   const [currentView, setCurrentView] = useState('dashboard');
   const [entrepreneurActiveTab, setEntrepreneurActiveTab] = useState('overview');
-
-  // Update activity on component load
-  updateActivity();
-
-  const userRole = authState.userRole || 'investor';
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const handleHomeClick = () => {
-    // Always navigate to dashboard, not home page
-    setCurrentView('dashboard');
-  };
 
   const renderCurrentView = () => {
     switch (currentView) {
@@ -264,7 +255,7 @@ const Dashboard = () => {
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <SlideOutMenu userRole={userRole} onLogout={handleLogout} />
+            <SlideOutMenu userRole={userRole} onLogout={onLogout} />
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">M</span>
@@ -277,15 +268,6 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleHomeClick}
-              className="hidden md:flex"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
             <Button variant="ghost" size="sm" className="hidden md:flex">
               <Bell className="w-4 h-4" />
             </Button>
@@ -301,7 +283,7 @@ const Dashboard = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={handleLogout}
+              onClick={onLogout}
               className="hidden md:flex"
             >
               Logout

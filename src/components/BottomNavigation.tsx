@@ -2,7 +2,6 @@
 import { Home, Lightbulb, Plus, MessageCircle, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface BottomNavigationProps {
   userRole: 'investor' | 'entrepreneur' | 'philanthropist';
@@ -11,18 +10,10 @@ interface BottomNavigationProps {
 const BottomNavigation = ({ userRole }: BottomNavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { updateActivity } = useAuth();
-
-  const handleNavigation = (path: string) => {
-    updateActivity();
-    navigate(path);
-  };
 
   const getNavItems = () => {
-    const dashboardPath = userRole === 'entrepreneur' ? '/entrepreneur-dashboard' : '/dashboard';
-    
     const baseItems = [
-      { icon: Home, label: "Dashboard", path: dashboardPath },
+      { icon: Home, label: "Dashboard", path: "/" },
       { icon: Lightbulb, label: "Projects", path: userRole === 'entrepreneur' ? "/entrepreneur-projects" : "/investment-opportunities" },
       { icon: Plus, label: "Create", path: userRole === 'entrepreneur' ? "/entrepreneur-create" : "/create-post" },
       { icon: MessageCircle, label: "Chat", path: userRole === 'entrepreneur' ? "/entrepreneur-chat" : "/messages" },
@@ -45,7 +36,7 @@ const BottomNavigation = ({ userRole }: BottomNavigationProps) => {
               key={item.label}
               variant="ghost"
               size="sm"
-              onClick={() => handleNavigation(item.path)}
+              onClick={() => navigate(item.path)}
               className={`flex flex-col items-center gap-1 px-2 py-3 ${
                 isActive 
                   ? 'text-amber-600' 

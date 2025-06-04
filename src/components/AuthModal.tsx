@@ -23,6 +23,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
   const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(defaultRole || null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [currentTab, setCurrentTab] = useState(defaultTab);
 
@@ -37,6 +38,17 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
     if (selectedRole) {
       setShowSignUpForm(true);
     }
+  };
+
+  const handleContinueToSignIn = () => {
+    if (selectedRole) {
+      setCurrentTab("auth");
+      setIsSignUp(false);
+    }
+  };
+
+  const handleDirectSignIn = () => {
+    setCurrentTab("sign-in");
   };
 
   if (showSignUpForm && selectedRole) {
@@ -63,14 +75,19 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
             </div>
           </div>
           <DialogTitle className="text-2xl font-bold text-center text-gray-900">
-            {currentTab === "role-selection" ? "Choose Your Role" : "Sign In to MANSA"}
+            {currentTab === "role-selection" ? "Choose Your Role" : 
+             currentTab === "sign-in" ? "Sign In to MANSA" :
+             (isSignUp ? "Join MANSA" : "Welcome Back")}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/50">
+          <TabsList className="grid w-full grid-cols-3 bg-white/50">
             <TabsTrigger value="role-selection" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Choose Your Role</TabsTrigger>
             <TabsTrigger value="sign-in" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Sign In</TabsTrigger>
+            <TabsTrigger value="auth" disabled={!selectedRole} className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+              {isSignUp ? "Sign Up" : "Sign In"}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="role-selection" className="space-y-6">
@@ -176,10 +193,10 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => setCurrentTab("sign-in")}
+                    onClick={handleContinueToSignIn}
                     className="border-amber-500 text-amber-700 hover:bg-amber-50"
                   >
-                    Already have an account?
+                    Sign In
                   </Button>
                 </div>
               </div>
@@ -255,6 +272,60 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                 type="button"
                 onClick={() => setCurrentTab("role-selection")}
                 className="text-amber-600 hover:text-amber-700 text-sm font-medium"
+              >
+                Don't have an account? Sign up
+              </button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="auth" className="space-y-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-semibold mb-2">
+                {isSignUp ? "Create Your Account" : "Sign In to Your Account"}
+              </h3>
+              <p className="text-gray-600">
+                You're signing in as a <Badge className="bg-amber-100 text-amber-800">{selectedRole}</Badge>
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Enter your email"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+              >
+                Sign In
+              </Button>
+            </form>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowSignUpForm(true)}
+                className="text-amber-600 hover:text-amber-700 text-sm"
               >
                 Don't have an account? Sign up
               </button>
