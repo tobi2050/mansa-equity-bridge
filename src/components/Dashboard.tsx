@@ -126,7 +126,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                 <Button 
                   variant="outline" 
                   className="h-20 flex flex-col gap-2"
-                  onClick={() => setCurrentView('entrepreneur-dashboard')}
+                  onClick={() => navigateTo('entrepreneur-dashboard')}
                 >
                   <Building2 className="w-6 h-6" />
                   <span className="text-xs">Manage Businesses</span>
@@ -173,7 +173,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                   <p className="text-sm text-green-600 mt-1">Discover new investment opportunities in African businesses</p>
                 </div>
                 <Button 
-                  onClick={() => setCurrentView('investment-opportunities')}
+                  onClick={() => navigateTo('investment-opportunities')}
                   className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700"
                 >
                   Browse Opportunities
@@ -224,7 +224,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
                 <Button 
                   variant="outline" 
                   className="h-20 flex flex-col gap-2"
-                  onClick={() => setCurrentView('investment-opportunities')}
+                  onClick={() => navigateTo('investment-opportunities')}
                 >
                   <Building2 className="w-6 h-6" />
                   <span className="text-xs">Find Opportunities</span>
