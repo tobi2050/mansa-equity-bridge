@@ -88,7 +88,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center">
-          <div className="w-20 h-12 bg-gradient-to-r from-blue-800 to-blue-900 rounded flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">MANSA</span>
           </div>
           <DialogTitle className="text-2xl font-bold">Create Your MANSA Account</DialogTitle>
@@ -165,7 +165,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
 
           <div>
             <Label htmlFor="role" className="text-sm font-medium">I am registering as an...*</Label>
-            <Select value={selectedRole} disabled>
+            <Select value={selectedRole || "investor"} disabled>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -186,20 +186,20 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
               onCheckedChange={(checked) => setFormData({...formData, agreeToTerms: checked as boolean})}
             />
             <Label htmlFor="agreeToTerms" className="text-sm">
-              I agree to MANSA's <span className="text-blue-600 underline">Terms</span> and <span className="text-blue-600 underline">Privacy Policy</span>.
+              I agree to MANSA's <span className="text-amber-600 underline">Terms</span> and <span className="text-amber-600 underline">Privacy Policy</span>.
             </Label>
           </div>
 
           <Button 
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3"
+            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-3"
           >
             Create Account
           </Button>
 
           <div className="text-center">
             <span className="text-sm text-gray-600">
-              Already have an account? <button type="button" className="text-blue-600 underline">Sign in</button>
+              Already have an account? <button type="button" className="text-amber-600 underline">Sign in</button>
             </span>
           </div>
         </form>
