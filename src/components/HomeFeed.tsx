@@ -17,8 +17,10 @@ import {
   Users,
   Bookmark,
   ArrowLeft,
-  Home
+  Home,
+  Plus
 } from "lucide-react";
+import BottomNavigation from "./BottomNavigation";
 
 interface HomeFeedProps {
   userRole: 'investor' | 'entrepreneur' | 'philanthropist';
@@ -102,13 +104,18 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
     }
   };
 
+  const handleUserClick = (author: string) => {
+    // Navigate to user profile
+    navigate(`/profile/${author.toLowerCase().replace(' ', '-')}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header with Navigation */}
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
@@ -117,8 +124,12 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
-              <Home className="w-4 h-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(userRole === 'entrepreneur' ? '/entrepreneur-create' : '/create-post')}
+            >
+              <Plus className="w-4 h-4" />
             </Button>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
               <Users className="w-4 h-4 mr-2" />
@@ -198,13 +209,21 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
                 {/* Post Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10">
+                    <Avatar 
+                      className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-amber-500" 
+                      onClick={() => handleUserClick(post.author)}
+                    >
                       <AvatarFallback>
                         {post.author.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-gray-900">{post.author}</p>
+                      <p 
+                        className="font-medium text-gray-900 cursor-pointer hover:text-amber-600" 
+                        onClick={() => handleUserClick(post.author)}
+                      >
+                        {post.author}
+                      </p>
                       <div className="flex items-center gap-2">
                         <Badge className={getRoleColor(post.role)} variant="secondary">
                           {post.role}
@@ -263,6 +282,9 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
           <Button variant="outline">Load More Posts</Button>
         </div>
       </div>
+
+      {/* Bottom navigation for mobile */}
+      <BottomNavigation userRole={userRole} />
     </div>
   );
 };

@@ -41,6 +41,12 @@ const Index = () => {
     setShowAuthModal(true);
   };
 
+  const handleListBusiness = () => {
+    setAuthModalTab("role-selection");
+    setAuthModalDefaultRole('entrepreneur'); // Highlight entrepreneur for "List Your Business"
+    setShowAuthModal(true);
+  };
+
   const handleSignIn = () => {
     setAuthModalTab("sign-in"); // Go directly to sign-in tab
     setAuthModalDefaultRole(undefined);
@@ -122,7 +128,7 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              onClick={handleGetStarted}
+              onClick={handleListBusiness}
               className="border-amber-500 text-amber-700 hover:bg-amber-50 px-8 py-4 text-lg"
             >
               List Your Business

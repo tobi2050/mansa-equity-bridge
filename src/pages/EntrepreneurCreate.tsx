@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, Building2, FileText, MessageCircle, Users, Calendar, Target } from "lucide-react";
+import BottomNavigation from "@/components/BottomNavigation";
 
 const EntrepreneurCreate = () => {
   const navigate = useNavigate();
+  const userRole = 'entrepreneur' as const;
 
   const createOptions = [
     {
@@ -60,7 +62,7 @@ const EntrepreneurCreate = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -68,7 +70,7 @@ const EntrepreneurCreate = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className="mr-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -82,61 +84,62 @@ const EntrepreneurCreate = () => {
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-6">
-        <div className="space-y-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">What would you like to create?</h2>
-            <p className="text-gray-600">Choose from the options below to get started</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {createOptions.map((option) => {
-              const Icon = option.icon;
-              return (
-                <Card 
-                  key={option.id}
-                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
-                  onClick={option.action}
-                >
-                  <CardHeader className="text-center pb-4">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${option.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                      <Icon className="h-8 w-8 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">{option.title}</CardTitle>
-                    <CardDescription className="text-sm">
-                      {option.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button 
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                      onClick={option.action}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Quick tips */}
-          <Card className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-blue-800">Quick Tips</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-blue-700">
-                <li>• Start with a business listing if this is your first time on MANSA</li>
-                <li>• Regular updates help build investor confidence</li>
-                <li>• Milestone reports unlock funding tranches</li>
-                <li>• Team member profiles add credibility to your business</li>
-              </ul>
-            </CardContent>
-          </Card>
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">What would you like to create?</h2>
+          <p className="text-gray-600">Choose from the options below to get started</p>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {createOptions.map((option) => {
+            const Icon = option.icon;
+            return (
+              <Card 
+                key={option.id}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+                onClick={option.action}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className={`w-16 h-16 bg-gradient-to-r ${option.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                    <Icon className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-lg">{option.title}</CardTitle>
+                  <CardDescription className="text-sm">
+                    {option.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                    onClick={option.action}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Quick tips */}
+        <Card className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-800">Quick Tips</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-blue-700">
+              <li>• Start with a business listing if this is your first time on MANSA</li>
+              <li>• Regular updates help build investor confidence</li>
+              <li>• Milestone reports unlock funding tranches</li>
+              <li>• Team member profiles add credibility to your business</li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Bottom navigation for mobile */}
+      <BottomNavigation userRole={userRole} />
     </div>
   );
 };

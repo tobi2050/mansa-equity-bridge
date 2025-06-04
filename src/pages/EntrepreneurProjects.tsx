@@ -5,73 +5,63 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Users, Calendar, MessageSquare, Plus, Edit, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Building2, DollarSign, Users, Target, Calendar, Edit, Eye } from "lucide-react";
+import BottomNavigation from "@/components/BottomNavigation";
 
 const EntrepreneurProjects = () => {
   const navigate = useNavigate();
+  const userRole = 'entrepreneur' as const;
+
   const [projects] = useState([
     {
       id: 1,
-      title: "EcoFarm Nigeria - Organic Agriculture",
-      description: "Sustainable farming initiative connecting rural farmers with urban markets through organic certification and digital marketplace.",
-      stage: "Scaling",
-      fundingGoal: 75000,
-      currentFunding: 45000,
-      category: "Agriculture",
-      equityOffered: 15,
-      bidders: 8,
-      timeLeft: "12 days",
-      milestones: 5,
-      completedMilestones: 3,
+      name: "EcoFarm Nigeria",
+      description: "Sustainable agriculture platform connecting farmers with consumers",
       status: "Active",
-      comments: 24
+      funding: { raised: 45000, target: 100000 },
+      investors: 12,
+      milestones: { completed: 3, total: 5 },
+      progress: 60,
+      category: "Agriculture",
+      location: "Lagos, Nigeria"
     },
     {
       id: 2,
-      title: "Lagos FinTech Solutions",
-      description: "Mobile payment platform for small businesses across West Africa with focus on rural accessibility.",
-      stage: "MVP",
-      fundingGoal: 120000,
-      currentFunding: 78000,
-      category: "FinTech",
-      equityOffered: 20,
-      bidders: 15,
-      timeLeft: "8 days",
-      milestones: 5,
-      completedMilestones: 4,
-      status: "Active",
-      comments: 42
+      name: "Solar Tech Solutions",
+      description: "Affordable solar panel installation for rural communities",
+      status: "Funding",
+      funding: { raised: 15000, target: 50000 },
+      investors: 5,
+      milestones: { completed: 1, total: 4 },
+      progress: 30,
+      category: "Clean Energy",
+      location: "Accra, Ghana"
     },
     {
       id: 3,
-      title: "Solar Energy Ghana",
-      description: "Affordable solar panel manufacturing and installation for rural communities in Ghana.",
-      stage: "Prototype",
-      fundingGoal: 95000,
-      currentFunding: 12000,
-      category: "Energy",
-      equityOffered: 18,
-      bidders: 3,
-      timeLeft: "25 days",
-      milestones: 5,
-      completedMilestones: 1,
-      status: "Active",
-      comments: 8
+      name: "FinTech Mobile App",
+      description: "Digital banking solution for unbanked populations",
+      status: "Planning",
+      funding: { raised: 0, target: 75000 },
+      investors: 0,
+      milestones: { completed: 0, total: 5 },
+      progress: 10,
+      category: "FinTech",
+      location: "Nairobi, Kenya"
     }
   ]);
 
-  const getStageColor = (stage: string) => {
-    switch (stage) {
-      case 'Idea': return 'bg-gray-100 text-gray-800';
-      case 'Prototype': return 'bg-blue-100 text-blue-800';
-      case 'MVP': return 'bg-yellow-100 text-yellow-800';
-      case 'Scaling': return 'bg-green-100 text-green-800';
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return 'bg-green-100 text-green-800';
+      case 'Funding': return 'bg-blue-100 text-blue-800';
+      case 'Planning': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -79,7 +69,7 @@ const EntrepreneurProjects = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className="mr-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -89,10 +79,9 @@ const EntrepreneurProjects = () => {
               <p className="text-xs text-gray-600">Manage your business projects and funding</p>
             </div>
           </div>
-          
           <Button 
-            onClick={() => navigate('/create-project')}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+            onClick={() => navigate('/entrepreneur-create')}
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Project
@@ -101,153 +90,119 @@ const EntrepreneurProjects = () => {
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-6">
-        <div className="space-y-6">
-          {/* Stats overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-blue-600">{projects.length}</div>
-                <div className="text-sm text-gray-600">Active Projects</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  ${projects.reduce((sum, p) => sum + p.currentFunding, 0).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Total Funded</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {projects.reduce((sum, p) => sum + p.bidders, 0)}
-                </div>
-                <div className="text-sm text-gray-600">Total Bidders</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-amber-600">
-                  {Math.round((projects.reduce((sum, p) => sum + (p.currentFunding / p.fundingGoal), 0) / projects.length) * 100)}%
-                </div>
-                <div className="text-sm text-gray-600">Avg. Progress</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Projects list */}
-          <div className="space-y-6">
-            {projects.map((project) => (
-              <Card key={project.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{project.title}</CardTitle>
-                      <CardDescription className="text-base mt-2">
-                        {project.description}
-                      </CardDescription>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className={getStageColor(project.stage)}>
-                        {project.stage}
-                      </Badge>
-                      <Badge variant="outline">
-                        {project.category}
-                      </Badge>
-                      <Badge className="bg-green-100 text-green-800">
-                        {project.status}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Funding Progress</span>
-                        <span className="font-medium">
-                          ${project.currentFunding.toLocaleString()} / ${project.fundingGoal.toLocaleString()}
-                        </span>
-                      </div>
-                      <Progress 
-                        value={(project.currentFunding / project.fundingGoal) * 100} 
-                        className="h-2"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Milestones</span>
-                        <span className="font-medium">
-                          {project.completedMilestones} / {project.milestones}
-                        </span>
-                      </div>
-                      <Progress 
-                        value={(project.completedMilestones / project.milestones) * 100} 
-                        className="h-2"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid sm:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Equity Offered:</span>
-                      <p className="font-medium">{project.equityOffered}%</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Active Bidders:</span>
-                      <p className="font-medium">{project.bidders}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Comments:</span>
-                      <p className="font-medium">{project.comments}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Time Remaining:</span>
-                      <p className="font-medium">{project.timeLeft}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t">
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{project.bidders} bidders</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>{project.comments} comments</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{project.timeLeft} left</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        Messages
-                      </Button>
-                      <Button 
-                        size="sm"
-                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-blue-600">{projects.length}</div>
+              <div className="text-xs text-gray-600">Total Projects</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-green-600">$60K</div>
+              <div className="text-xs text-gray-600">Total Raised</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-purple-600">17</div>
+              <div className="text-xs text-gray-600">Total Investors</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Target className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-amber-600">4/14</div>
+              <div className="text-xs text-gray-600">Milestones</div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Projects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <Card key={project.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{project.name}</CardTitle>
+                    <CardDescription className="mt-1">{project.description}</CardDescription>
+                  </div>
+                  <Badge className={getStatusColor(project.status)} variant="secondary">
+                    {project.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Funding Progress */}
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Funding Progress</span>
+                    <span>${project.funding.raised.toLocaleString()} / ${project.funding.target.toLocaleString()}</span>
+                  </div>
+                  <Progress value={(project.funding.raised / project.funding.target) * 100} className="h-2" />
+                </div>
+
+                {/* Project Stats */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-500" />
+                    <span>{project.investors} investors</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-gray-500" />
+                    <span>{project.milestones.completed}/{project.milestones.total} milestones</span>
+                  </div>
+                </div>
+
+                {/* Project Details */}
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Category: {project.category}</div>
+                  <div>Location: {project.location}</div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Empty State for New Users */}
+        {projects.length === 0 && (
+          <Card className="text-center py-12">
+            <CardContent>
+              <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No projects yet</h3>
+              <p className="text-gray-600 mb-6">Create your first project to start raising funds from investors</p>
+              <Button 
+                onClick={() => navigate('/entrepreneur-create')}
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Project
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      {/* Bottom navigation for mobile */}
+      <BottomNavigation userRole={userRole} />
     </div>
   );
 };
