@@ -17,6 +17,8 @@ interface SignUpFormProps {
 }
 
 const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps) => {
+  console.log('SignUpForm rendered with selectedRole:', selectedRole);
+  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -83,6 +85,10 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     }
     return null;
   };
+
+  // Ensure selectedRole is never empty or undefined
+  const safeSelectedRole = selectedRole || 'investor';
+  console.log('Using safeSelectedRole:', safeSelectedRole);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -165,7 +171,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
 
           <div>
             <Label htmlFor="role" className="text-sm font-medium">I am registering as an...*</Label>
-            <Select value={selectedRole || "investor"} disabled>
+            <Select value={safeSelectedRole} disabled>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
