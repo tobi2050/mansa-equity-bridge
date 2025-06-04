@@ -1,29 +1,26 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { 
+  TrendingUp, 
+  DollarSign, 
   Users, 
-  BookOpen, 
-  User, 
-  Calendar, 
-  MessageSquare, 
-  Menu,
-  Building2,
-  TrendingUp,
-  DollarSign,
+  Building2, 
   Target,
+  Calendar,
+  MessageCircle,
   Bell,
-  Settings
+  ChevronRight,
+  ArrowLeft
 } from "lucide-react";
-import InvestmentOpportunities from "@/components/InvestmentOpportunities";
-import BusinessListings from "@/components/BusinessListings";
-import EntrepreneurDashboard from "@/components/EntrepreneurDashboard";
+import EntrepreneurDashboard from "./EntrepreneurDashboard";
+import InvestmentOpportunities from "./InvestmentOpportunities";
+import SlideOutMenu from "./SlideOutMenu";
+import BottomNavigation from "./BottomNavigation";
 
 interface DashboardProps {
   userRole: 'investor' | 'entrepreneur' | 'philanthropist';
@@ -31,328 +28,277 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const navigate = useNavigate();
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [entrepreneurActiveTab, setEntrepreneurActiveTab] = useState('overview');
 
-  const getRoleIcon = () => {
-    switch (userRole) {
-      case 'investor': return <Users className="h-4 w-4" />;
-      case 'entrepreneur': return <BookOpen className="h-4 w-4" />;
-      case 'philanthropist': return <User className="h-4 w-4" />;
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case 'entrepreneur-dashboard':
+        return (
+          <EntrepreneurDashboard 
+            activeTab={entrepreneurActiveTab}
+            setActiveTab={setEntrepreneurActiveTab}
+            onBack={() => setCurrentView('dashboard')} 
+          />
+        );
+      case 'investment-opportunities':
+        return <InvestmentOpportunities onBack={() => setCurrentView('dashboard')} />;
+      default:
+        return renderMainDashboard();
     }
   };
 
-  const getRoleColor = () => {
-    switch (userRole) {
-      case 'investor': return 'bg-green-100 text-green-800';
-      case 'entrepreneur': return 'bg-blue-100 text-blue-800';
-      case 'philanthropist': return 'bg-purple-100 text-purple-800';
+  const renderMainDashboard = () => {
+    if (userRole === 'entrepreneur') {
+      return (
+        <div className="space-y-6">
+          {/* Profile completion banner */}
+          <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-amber-800">Complete Your Profile</h3>
+                  <p className="text-sm text-amber-600 mt-1">85% complete - Add business details to unlock all features</p>
+                  <Progress value={85} className="w-48 mt-2" />
+                </div>
+                <Button 
+                  onClick={() => navigate('/complete-profile')}
+                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
+                >
+                  Complete Profile
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick stats - Updated for multiple businesses */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-blue-600">3</div>
+                <div className="text-xs text-gray-600">Active Businesses</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-600">$45.8K</div>
+                <div className="text-xs text-gray-600">Total Funding Raised</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-600">24</div>
+                <div className="text-xs text-gray-600">Total Investors</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Target className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-amber-600">8/15</div>
+                <div className="text-xs text-gray-600">Milestones</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => setCurrentView('entrepreneur-dashboard')}
+                >
+                  <Building2 className="w-6 h-6" />
+                  <span className="text-xs">Manage Businesses</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/entrepreneur-projects')}
+                >
+                  <DollarSign className="w-6 h-6" />
+                  <span className="text-xs">View Projects</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/entrepreneur-chat')}
+                >
+                  <MessageCircle className="w-6 h-6" />
+                  <span className="text-xs">Chat</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/feed')}
+                >
+                  <TrendingUp className="w-6 h-6" />
+                  <span className="text-xs">Activity Feed</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    } else {
+      // Investor/Philanthropist dashboard
+      return (
+        <div className="space-y-6">
+          {/* Welcome banner */}
+          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-blue-50">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-green-800">Welcome Back!</h3>
+                  <p className="text-sm text-green-600 mt-1">Discover new investment opportunities in African businesses</p>
+                </div>
+                <Button 
+                  onClick={() => setCurrentView('investment-opportunities')}
+                  className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700"
+                >
+                  Browse Opportunities
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Portfolio stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-600">$45.2K</div>
+                <div className="text-xs text-gray-600">Total Invested</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-blue-600">$52.8K</div>
+                <div className="text-xs text-gray-600">Portfolio Value</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Building2 className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-600">12</div>
+                <div className="text-xs text-gray-600">Investments</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Target className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-amber-600">+16.8%</div>
+                <div className="text-xs text-gray-600">ROI</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => setCurrentView('investment-opportunities')}
+                >
+                  <Building2 className="w-6 h-6" />
+                  <span className="text-xs">Find Opportunities</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/profile')}
+                >
+                  <Users className="w-6 h-6" />
+                  <span className="text-xs">My Portfolio</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/messages')}
+                >
+                  <MessageCircle className="w-6 h-6" />
+                  <span className="text-xs">Messages</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={() => navigate('/feed')}
+                >
+                  <TrendingUp className="w-6 h-6" />
+                  <span className="text-xs">Activity Feed</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
     }
   };
 
-  const MobileNavigation = () => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="md:hidden">
-          <Menu className="h-4 w-4" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-72 p-0">
-        <div className="flex flex-col h-full bg-white">
-          <div className="p-4 border-b border-gray-200">
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b px-4 py-4 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <SlideOutMenu userRole={userRole} onLogout={onLogout} />
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">M</span>
               </div>
-              <div>
-                <h2 className="font-semibold text-gray-900">MANSA</h2>
-                <Badge className={`${getRoleColor()} text-xs`}>
-                  {getRoleIcon()}
-                  <span className="ml-1 capitalize">{userRole}</span>
-                </Badge>
+              <div className="hidden md:block">
+                <h1 className="text-xl font-bold text-gray-900">MANSA</h1>
+                <p className="text-xs text-gray-600 capitalize">{userRole} Dashboard</p>
               </div>
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto">
-            <nav className="p-2 space-y-1">
-              {userRole === 'entrepreneur' ? (
-                <>
-                  <NavItem icon={<TrendingUp className="h-4 w-4" />} label="Dashboard" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} />
-                  <NavItem icon={<Building2 className="h-4 w-4" />} label="My Business Profile" onClick={() => setActiveTab("profile")} />
-                  <NavItem icon={<DollarSign className="h-4 w-4" />} label="Funding Opportunities" onClick={() => setActiveTab("opportunities")} />
-                  <NavItem icon={<MessageSquare className="h-4 w-4" />} label="Investor Communications" onClick={() => setActiveTab("messages")} />
-                  <NavItem icon={<Users className="h-4 w-4" />} label="Investment Offers" onClick={() => setActiveTab("offers")} />
-                  <NavItem icon={<Target className="h-4 w-4" />} label="Milestone Tracking" onClick={() => setActiveTab("milestones")} />
-                  <NavItem icon={<TrendingUp className="h-4 w-4" />} label="Financial Reports" onClick={() => setActiveTab("reports")} />
-                </>
-              ) : (
-                <>
-                  <NavItem icon={<TrendingUp className="h-4 w-4" />} label="Dashboard" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} />
-                  <NavItem icon={<BookOpen className="h-4 w-4" />} label="Opportunities" onClick={() => setActiveTab("opportunities")} />
-                  <NavItem icon={<MessageSquare className="h-4 w-4" />} label="Activity" onClick={() => setActiveTab("activity")} />
-                  <NavItem icon={<User className="h-4 w-4" />} label="Profile" onClick={() => setActiveTab("profile")} />
-                </>
-              )}
-              <NavItem icon={<Settings className="h-4 w-4" />} label="Settings" onClick={() => setActiveTab("settings")} />
-            </nav>
-          </div>
-          
-          <div className="p-4 border-t border-gray-200">
-            <Button variant="outline" onClick={onLogout} className="w-full">
+          <div className="flex items-center space-x-3">
+            <Button variant="ghost" size="sm" className="hidden md:flex">
+              <Bell className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/profile')}
+              className="hidden md:flex"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onLogout}
+              className="hidden md:flex"
+            >
               Logout
             </Button>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
-  );
-
-  const NavItem = ({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick: () => void }) => (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        active 
-          ? 'bg-amber-100 text-amber-800' 
-          : 'text-gray-700 hover:bg-gray-100'
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-First Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <MobileNavigation />
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">M</span>
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg font-bold text-gray-900">MANSA</h1>
-              </div>
-            </div>
-            <Badge className={`${getRoleColor()} hidden sm:flex`}>
-              {getRoleIcon()}
-              <span className="ml-1 capitalize text-xs">{userRole}</span>
-            </Badge>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
-            </Button>
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">JD</AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
-
-      <div className="px-4 py-4 md:px-6 md:py-8">
-        {/* Mobile-optimized content */}
-        {userRole === 'entrepreneur' ? (
-          <EntrepreneurDashboard activeTab={activeTab} setActiveTab={setActiveTab} />
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
-              <TabsTrigger value="overview" className="text-xs md:text-sm">Overview</TabsTrigger>
-              <TabsTrigger value="opportunities" className="text-xs md:text-sm">Opportunities</TabsTrigger>
-              <TabsTrigger value="activity" className="text-xs md:text-sm">Activity</TabsTrigger>
-              <TabsTrigger value="profile" className="text-xs md:text-sm">Profile</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Total Invested' : 'Total Donated'}
-                    </CardTitle>
-                    <span className="text-xl md:text-2xl font-bold text-amber-600">$2,340</span>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground">
-                      +20.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Active Investments' : 'Supported Businesses'}
-                    </CardTitle>
-                    <span className="text-xl md:text-2xl font-bold text-amber-600">12</span>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground">
-                      +3 this month
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {userRole === 'investor' ? 'Portfolio Value' : 'Impact Score'}
-                    </CardTitle>
-                    <span className="text-xl md:text-2xl font-bold text-amber-600">
-                      {userRole === 'philanthropist' ? '8.5/10' : '$5,760'}
-                    </span>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground">
-                      +12% growth
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Recent Activity */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  <CardDescription>Your latest transactions and updates</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {userRole === 'investor' ? 'Investment in TechStart Africa' : 'Donation to Solar Energy Project'}
-                      </p>
-                      <p className="text-xs text-gray-500">2 hours ago</p>
-                    </div>
-                    <Badge variant="outline" className="text-green-600 border-green-200">
-                      +$500
-                    </Badge>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Milestone completed for AgriTech Solutions</p>
-                      <p className="text-xs text-gray-500">1 day ago</p>
-                    </div>
-                    <Badge variant="outline" className="text-blue-600 border-blue-200">
-                      Milestone 3/5
-                    </Badge>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {userRole === 'investor' ? 'Joined consortium for Manufacturing Co.' : 'Profile verification completed'}
-                      </p>
-                      <p className="text-xs text-gray-500">3 days ago</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="opportunities" className="space-y-4 md:space-y-6">
-              <InvestmentOpportunities userRole={userRole} />
-            </TabsContent>
-
-            <TabsContent value="activity" className="space-y-4 md:space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    Activity Feed
-                  </CardTitle>
-                  <CardDescription>Stay updated with your network and investments</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="border-l-2 border-amber-200 pl-4 pb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">EcoFarm Nigeria reached Milestone 4</h4>
-                        <span className="text-xs text-gray-500">2h ago</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        Successfully launched organic certification program and secured 50 new farmers.
-                      </p>
-                      <Progress value={80} className="h-2" />
-                      <p className="text-xs text-gray-500 mt-1">4/5 milestones completed</p>
-                    </div>
-                    
-                    <div className="border-l-2 border-blue-200 pl-4 pb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">New investment opportunity: Solar Tech Ghana</h4>
-                        <span className="text-xs text-gray-500">5h ago</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Seeking $50,000 for solar panel manufacturing startup in Accra.
-                      </p>
-                    </div>
-                    
-                    <div className="border-l-2 border-green-200 pl-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">Consortium formed for AgriTech Solutions</h4>
-                        <span className="text-xs text-gray-500">1d ago</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        5 investors joined forces to fund innovative farming technology in Kenya.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="profile" className="space-y-4 md:space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Settings</CardTitle>
-                  <CardDescription>Manage your account and preferences</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-medium mb-2">Account Information</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Email:</span> john.doe@example.com</p>
-                        <p><span className="font-medium">Role:</span> <Badge className={getRoleColor()}>{userRole}</Badge></p>
-                        <p><span className="font-medium">Member since:</span> January 2024</p>
-                        <p><span className="font-medium">Profile completion:</span> 85%</p>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-2">Verification Status</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Email Verified</span>
-                          <Badge className="bg-green-100 text-green-800">✓ Verified</Badge>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Identity Verified</span>
-                          <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Business Documents</span>
-                          <Badge className="bg-gray-100 text-gray-800">Not Required</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pt-4">
-                    <Button className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white">
-                      Complete Profile
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        )}
       </div>
+
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-6">
+        {renderCurrentView()}
+      </div>
+
+      {/* Bottom navigation for mobile */}
+      <BottomNavigation userRole={userRole} />
     </div>
   );
 };

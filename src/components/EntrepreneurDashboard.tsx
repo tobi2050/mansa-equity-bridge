@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 import { 
   Building2, 
   DollarSign, 
@@ -27,10 +27,12 @@ import MilestoneTracking from "@/components/MilestoneTracking";
 interface EntrepreneurDashboardProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onBack?: () => void;
 }
 
-const EntrepreneurDashboard = ({ activeTab, setActiveTab }: EntrepreneurDashboardProps) => {
-  const profileCompletion = 75; // This would come from user data
+const EntrepreneurDashboard = ({ activeTab, setActiveTab, onBack }: EntrepreneurDashboardProps) => {
+  const profileCompletion = 75;
+  const navigate = useNavigate();
   
   const renderMobileContent = () => {
     switch (activeTab) {
@@ -47,7 +49,7 @@ const EntrepreneurDashboard = ({ activeTab, setActiveTab }: EntrepreneurDashboar
       case "reports":
         return <FinancialReports />;
       default:
-        return <DashboardOverview profileCompletion={profileCompletion} />;
+        return <DashboardOverview profileCompletion={profileCompletion} navigate={navigate} />;
     }
   };
 
@@ -69,7 +71,7 @@ const EntrepreneurDashboard = ({ activeTab, setActiveTab }: EntrepreneurDashboar
           </TabsList>
 
           <TabsContent value="overview">
-            <DashboardOverview profileCompletion={profileCompletion} />
+            <DashboardOverview profileCompletion={profileCompletion} navigate={navigate} />
           </TabsContent>
 
           <TabsContent value="profile">
@@ -89,7 +91,7 @@ const EntrepreneurDashboard = ({ activeTab, setActiveTab }: EntrepreneurDashboar
   );
 };
 
-const DashboardOverview = ({ profileCompletion }: { profileCompletion: number }) => (
+const DashboardOverview = ({ profileCompletion, navigate }: { profileCompletion: number; navigate: (path: string) => void }) => (
   <div className="space-y-6">
     {/* Profile Completion Alert */}
     {profileCompletion < 80 && (
@@ -109,7 +111,11 @@ const DashboardOverview = ({ profileCompletion }: { profileCompletion: number })
                 </div>
                 <Progress value={profileCompletion} className="h-2" />
               </div>
-              <Button size="sm" className="mt-3 bg-amber-600 hover:bg-amber-700">
+              <Button 
+                size="sm" 
+                className="mt-3 bg-amber-600 hover:bg-amber-700"
+                onClick={() => navigate('/complete-profile')}
+              >
                 Complete Profile
               </Button>
             </div>
@@ -251,9 +257,13 @@ const DashboardOverview = ({ profileCompletion }: { profileCompletion: number })
             <MessageSquare className="h-5 w-5" />
             <span className="text-sm">Message Investors</span>
           </Button>
-          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+          <Button 
+            variant="outline" 
+            className="h-auto p-4 flex flex-col items-center space-y-2"
+            onClick={() => navigate('/profile')}
+          >
             <Building2 className="h-5 w-5" />
-            <span className="text-sm">Edit Business Profile</span>
+            <span className="text-sm">View Public Profile</span>
           </Button>
         </div>
       </CardContent>
