@@ -19,6 +19,9 @@ import EntrepreneurCreate from "./pages/EntrepreneurCreate";
 import EntrepreneurChat from "./pages/EntrepreneurChat";
 import InvestmentOpportunities from "./pages/InvestmentOpportunities";
 import InvestmentDetails from "./pages/InvestmentDetails";
+import InvestmentForm from "./pages/InvestmentForm";
+import BiddingProcess from "./pages/BiddingProcess";
+import ConsortiumCreation from "./pages/ConsortiumCreation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
