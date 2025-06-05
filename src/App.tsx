@@ -17,6 +17,9 @@ import CompleteProfilePage from "./pages/CompleteProfilePage";
 import EntrepreneurProjects from "./pages/EntrepreneurProjects";
 import EntrepreneurCreate from "./pages/EntrepreneurCreate";
 import EntrepreneurChat from "./pages/EntrepreneurChat";
+import InvestorChat from "./pages/InvestorChat";
+import Messages from "./pages/Messages";
+import Forums from "./pages/Forums";
 import InvestmentOpportunities from "./pages/InvestmentOpportunities";
 import InvestmentDetails from "./pages/InvestmentDetails";
 import InvestmentForm from "./pages/InvestmentForm";
@@ -46,8 +49,14 @@ const App = () => (
               <Route path="/entrepreneur-projects" element={<EntrepreneurProjects />} />
               <Route path="/entrepreneur-create" element={<EntrepreneurCreate />} />
               <Route path="/entrepreneur-chat" element={<EntrepreneurChat />} />
+              <Route path="/investor-chat" element={<InvestorChat />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/forums" element={<Forums />} />
               <Route path="/investment-opportunities" element={<InvestmentOpportunities />} />
               <Route path="/investment-details/:id" element={<InvestmentDetails />} />
+              <Route path="/investment-form/:id" element={<InvestmentForm />} />
+              <Route path="/bidding-process/:id" element={<BiddingProcess />} />
+              <Route path="/consortium-creation" element={<ConsortiumCreation />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
