@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ import {
   ArrowLeft,
   Home
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import InvestorProfile from "./InvestorProfile";
 import PhilanthropistProfile from "./PhilanthropistProfile";
 
@@ -31,6 +33,7 @@ interface UserProfileProps {
 
 const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
   const navigate = useNavigate();
+  const { userId } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
   const [currentMode, setCurrentMode] = useState<'investor' | 'philanthropist'>(
     userRole === 'investor' ? 'investor' : 'philanthropist'
