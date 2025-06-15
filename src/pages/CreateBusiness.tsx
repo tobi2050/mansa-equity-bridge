@@ -61,9 +61,13 @@ const CreateBusiness = () => {
       const { data, error } = await supabase
         .from('businesses')
         .insert({
-          ...businessData,
           user_id: user.id,
-          // Ensure optional fields are null if not provided, to match db schema
+          name: businessData.name,
+          industry: businessData.industry,
+          stage: businessData.stage,
+          location: businessData.location,
+          description: businessData.description,
+          funding_goal: businessData.funding_goal,
           monthly_revenue: businessData.monthly_revenue ?? null,
           monthly_expenses: businessData.monthly_expenses ?? null,
           employees: businessData.employees ?? null,
