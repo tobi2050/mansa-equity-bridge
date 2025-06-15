@@ -6,7 +6,7 @@ import { Menu, Home, User, Settings, LogOut, MessageCircle, TrendingUp, Building
 import { useNavigate } from "react-router-dom";
 
 interface SlideOutMenuProps {
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
   onLogout: () => void;
 }
 

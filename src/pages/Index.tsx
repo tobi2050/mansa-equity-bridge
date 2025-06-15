@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +13,11 @@ const Index = () => {
   const { authState, logout, isLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState("role-selection");
-  const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | undefined>(undefined);
+  const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'entrepreneur' | undefined>(undefined);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const handleLogin = (role: 'investor' | 'entrepreneur' | 'philanthropist') => {
+  const handleLogin = (role: 'investor' | 'entrepreneur') => {
     setShowAuthModal(false);
   };
 
@@ -154,7 +153,7 @@ const Index = () => {
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Empowering African Entrepreneurship
           </h3>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="border-amber-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mb-4">
@@ -206,34 +205,6 @@ const Index = () => {
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     Progress-based funding
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-amber-800">For Philanthropists</CardTitle>
-                <CardDescription>
-                  Support African businesses through donations without expecting financial returns, focusing on impact.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Impact-focused giving
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Track business progress
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    No equity expectations
                   </li>
                 </ul>
               </CardContent>

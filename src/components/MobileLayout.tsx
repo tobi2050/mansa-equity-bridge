@@ -4,7 +4,7 @@ import BottomNavigation from "./BottomNavigation";
 
 interface MobileLayoutProps {
   children: ReactNode;
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
 }
 
 const MobileLayout = ({ children, userRole }: MobileLayoutProps) => {
