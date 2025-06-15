@@ -1,5 +1,8 @@
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings } from "lucide-react";
 import { InvestorDashboardHeader } from "./investor-profile/InvestorDashboardHeader";
@@ -16,6 +19,26 @@ interface InvestorProfileProps {
 const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [profileCompletion] = useState(65); // Below 50% minimum
+
+  const { authState } = useAuth();
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['profile', authState.userId],
+    queryFn: async () => {
+      if (!authState.userId) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('default_contribution_mode')
+        .eq('id', authState.userId)
+        .maybeSingle();
+      
+      if (error) {
+        console.error("Error fetching investor profile:", error);
+        throw error;
+      }
+      return data;
+    },
+    enabled: !!authState.userId && isOwnProfile,
+  });
 
   const investorStats = {
     totalInvested: "$125,000",
@@ -51,7 +74,14 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
         </TabsList>
 
         <TabsContent value="overview">
-          <OverviewTab investorStats={investorStats} />
+          {isOwnProfile && isLoadingProfile ? (
+            <div className="text-center p-8">Loading...</div>
+          ) : (
+            <OverviewTab
+              investorStats={investorStats}
+              contributionMode={profile?.default_contribution_mode}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="opportunities">

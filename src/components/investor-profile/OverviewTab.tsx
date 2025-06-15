@@ -1,7 +1,7 @@
 
-import { InvestmentStats } from "./InvestmentStats";
-import { QuickActions } from "./QuickActions";
-import { PendingApprovals } from "./PendingApprovals";
+import { InvestingOverview } from "./overview/InvestingOverview";
+import { DonatingOverview } from "./overview/DonatingOverview";
+import { SupportingOverview } from "./overview/SupportingOverview";
 
 interface InvestorStats {
   totalInvested: string;
@@ -14,14 +14,17 @@ interface InvestorStats {
 
 interface OverviewTabProps {
   investorStats: InvestorStats;
+  contributionMode?: 'investing' | 'donating' | 'supporting' | null;
 }
 
-export const OverviewTab = ({ investorStats }: OverviewTabProps) => {
-  return (
-    <div className="space-y-6">
-      <InvestmentStats stats={investorStats} />
-      <QuickActions />
-      <PendingApprovals />
-    </div>
-  );
+export const OverviewTab = ({ investorStats, contributionMode = 'investing' }: OverviewTabProps) => {
+  switch (contributionMode) {
+    case 'donating':
+      return <DonatingOverview />;
+    case 'supporting':
+      return <SupportingOverview />;
+    case 'investing':
+    default:
+      return <InvestingOverview investorStats={investorStats} />;
+  }
 };
