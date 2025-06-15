@@ -138,7 +138,7 @@ const UserProfile = () => {
         followingCount={profileData.followingCount}
       />
 
-      <div className="p-4">
+      <div className="px-4">
         {profileData.role === 'investor' ? (
           <InvestorProfile 
             isOwnProfile={isOwnProfile} 

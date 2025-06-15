@@ -10,7 +10,7 @@ interface EntrepreneurProfileContentProps {
 
 const EntrepreneurProfileContent = ({ isOwnProfile, profile, businesses }: EntrepreneurProfileContentProps) => {
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-4 max-w-6xl mx-auto">
       <EntrepreneurStats profile={profile} businesses={businesses || []} />
       <EntrepreneurTabs
         profile={profile}
