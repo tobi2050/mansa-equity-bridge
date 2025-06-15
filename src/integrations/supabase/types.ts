@@ -61,9 +61,12 @@ export type Database = {
           bio: string | null
           business_description: string | null
           business_name: string | null
+          business_verified: boolean
           default_contribution_mode: Database["public"]["Enums"]["contribution_mode"]
+          email_verified: boolean
           full_name: string | null
           id: string
+          identity_verified: boolean
           industry_preferences: string[] | null
           investment_motivation:
             | Database["public"]["Enums"]["investor_motivation"]
@@ -73,17 +76,22 @@ export type Database = {
             | Database["public"]["Enums"]["investor_org_type"]
             | null
           phone_number: string | null
+          phone_verified: boolean
           profile_image_url: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          trust_score: number
           updated_at: string | null
         }
         Insert: {
           bio?: string | null
           business_description?: string | null
           business_name?: string | null
+          business_verified?: boolean
           default_contribution_mode?: Database["public"]["Enums"]["contribution_mode"]
+          email_verified?: boolean
           full_name?: string | null
           id: string
+          identity_verified?: boolean
           industry_preferences?: string[] | null
           investment_motivation?:
             | Database["public"]["Enums"]["investor_motivation"]
@@ -93,17 +101,22 @@ export type Database = {
             | Database["public"]["Enums"]["investor_org_type"]
             | null
           phone_number?: string | null
+          phone_verified?: boolean
           profile_image_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          trust_score?: number
           updated_at?: string | null
         }
         Update: {
           bio?: string | null
           business_description?: string | null
           business_name?: string | null
+          business_verified?: boolean
           default_contribution_mode?: Database["public"]["Enums"]["contribution_mode"]
+          email_verified?: boolean
           full_name?: string | null
           id?: string
+          identity_verified?: boolean
           industry_preferences?: string[] | null
           investment_motivation?:
             | Database["public"]["Enums"]["investor_motivation"]
@@ -113,11 +126,54 @@ export type Database = {
             | Database["public"]["Enums"]["investor_org_type"]
             | null
           phone_number?: string | null
+          phone_verified?: boolean
           profile_image_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          trust_score?: number
           updated_at?: string | null
         }
         Relationships: []
+      }
+      verification_documents: {
+        Row: {
+          created_at: string
+          document_type: Database["public"]["Enums"]["verification_document_type"]
+          file_url: string
+          id: string
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["verification_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: Database["public"]["Enums"]["verification_document_type"]
+          file_url: string
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["verification_document_type"]
+          file_url?: string
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -131,6 +187,13 @@ export type Database = {
       investor_motivation: "ROI-focused" | "Impact-focused" | "Mixed"
       investor_org_type: "Individual" | "NGO" | "Charity" | "Investment Firm"
       user_role: "entrepreneur" | "investor"
+      verification_document_type:
+        | "identity_card"
+        | "passport"
+        | "drivers_license"
+        | "business_registration"
+        | "proof_of_address"
+      verification_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -250,6 +313,14 @@ export const Constants = {
       investor_motivation: ["ROI-focused", "Impact-focused", "Mixed"],
       investor_org_type: ["Individual", "NGO", "Charity", "Investment Firm"],
       user_role: ["entrepreneur", "investor"],
+      verification_document_type: [
+        "identity_card",
+        "passport",
+        "drivers_license",
+        "business_registration",
+        "proof_of_address",
+      ],
+      verification_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

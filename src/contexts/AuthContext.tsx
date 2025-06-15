@@ -9,6 +9,11 @@ interface UserProfile {
   role: 'investor' | 'entrepreneur';
   full_name: string;
   default_contribution_mode: 'investing' | 'donating' | 'supporting';
+  email_verified: boolean;
+  phone_verified: boolean;
+  identity_verified: boolean;
+  business_verified: boolean;
+  trust_score: number;
 }
 
 interface AuthContextType {
@@ -46,7 +51,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (session?.user) {
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
-          .select('id, role, full_name, default_contribution_mode')
+          .select('id, role, full_name, default_contribution_mode, email_verified, phone_verified, identity_verified, business_verified, trust_score')
           .eq('id', session.user.id)
           .single();
 
@@ -70,7 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoading(true);
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
-          .select('id, role, full_name, default_contribution_mode')
+          .select('id, role, full_name, default_contribution_mode, email_verified, phone_verified, identity_verified, business_verified, trust_score')
           .eq('id', session.user.id)
           .single();
 

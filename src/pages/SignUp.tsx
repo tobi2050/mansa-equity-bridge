@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,6 @@ const SignUp = () => {
     password: string;
     confirmPassword: string;
     userType: "investor" | "entrepreneur" | "";
-    phoneNumber: string;
     organizationType: string;
     investmentMotivation: string;
     industryPreferences: { value: string; label: string }[];
@@ -33,7 +33,6 @@ const SignUp = () => {
     password: "",
     confirmPassword: "",
     userType: "",
-    phoneNumber: "",
     organizationType: "Individual",
     investmentMotivation: "ROI-focused",
     industryPreferences: [],
@@ -66,15 +65,6 @@ const SignUp = () => {
       return;
     }
 
-    if (formData.userType === 'entrepreneur' && !formData.phoneNumber) {
-      toast({
-        title: "Error",
-        description: "Please enter your phone number",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsLoading(true);
     
     const { error } = await supabase.auth.signUp({
@@ -84,9 +74,6 @@ const SignUp = () => {
         data: {
           full_name: `${formData.firstName} ${formData.lastName}`,
           user_type: formData.userType,
-          ...(formData.userType === 'entrepreneur' && {
-            phone_number: formData.phoneNumber
-          }),
           ...(formData.userType === 'investor' && {
             organization_type: formData.organizationType,
             investment_motivation: formData.investmentMotivation,
@@ -176,20 +163,6 @@ const SignUp = () => {
                 </div>
               </RadioGroup>
             </div>
-
-            {formData.userType === 'entrepreneur' && (
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  placeholder="Your phone number"
-                  value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                  required
-                />
-              </div>
-            )}
             
             {formData.userType === 'investor' && (
               <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">

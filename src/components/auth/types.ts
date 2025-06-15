@@ -8,6 +8,5 @@ export interface SignUpFormData {
   organizationType: string;
   investmentMotivation: string;
   industryPreferences: { value: string; label: string }[];
-  phoneNumber: string;
   defaultContributionMode: string;
 }
