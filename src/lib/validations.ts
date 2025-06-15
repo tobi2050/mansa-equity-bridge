@@ -51,6 +51,18 @@ export const SignUpFormSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"];
+
+const fileSchema = z
+  .instanceof(FileList)
+  .refine((files) => files?.length > 0, 'File is required.')
+  .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+  .refine(
+    (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+    'Only .jpg, .jpeg, .png, .webp, and .pdf files are accepted.'
+  );
+
 // Create Business Schema
 export const CreateBusinessSchema = z.object({
   name: z.string().min(3, { message: "Business name must be at least 3 characters." }),
@@ -63,4 +75,8 @@ export const CreateBusinessSchema = z.object({
   monthly_expenses: z.coerce.number().min(0, { message: "Monthly expenses cannot be negative." }).optional(),
   employees: z.string().optional(),
   use_of_funds: z.string().optional(),
+  governmentId: fileSchema,
+  businessRegistration: fileSchema,
+  proofOfAddress: fileSchema.optional(),
+  bankStatement: fileSchema.optional(),
 });
