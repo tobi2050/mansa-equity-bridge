@@ -1,40 +1,80 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import EntrepreneurHeroSection from "./entrepreneur/EntrepreneurHeroSection";
+import EntrepreneurTabs from "./entrepreneur/EntrepreneurTabs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface EntrepreneurProfileContentProps {
   isOwnProfile?: boolean;
 }
 
 const EntrepreneurProfileContent = ({ isOwnProfile }: EntrepreneurProfileContentProps) => {
-  // Mock data for now, will be replaced with real data fetching
-  const businesses = [
-    { id: 1, name: "AgriTech Solutions", description: "Revolutionizing farming in Africa." },
-  ];
+  const { user } = useAuth();
+
+  // Fetch entrepreneur's businesses
+  const { data: businesses, isLoading: loadingBusinesses } = useQuery({
+    queryKey: ["entrepreneur-businesses", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Error fetching businesses:", error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch trust/verification data from profiles table
+  const { data: profile, isLoading: loadingProfile } = useQuery({
+    queryKey: ["entrepreneur-profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  if (loadingProfile || loadingBusinesses) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-16 w-2/3" />
+        <Skeleton className="h-56 w-full" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return <div className="p-4 text-gray-500">Could not load entrepreneur data.</div>;
+  }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>My Businesses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {businesses.length > 0 ? (
-            <ul className="space-y-2">
-              {businesses.map(b => (
-                <li key={b.id} className="p-2 border rounded">
-                  <h4 className="font-semibold">{b.name}</h4>
-                  <p className="text-sm text-gray-600">{b.description}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">No businesses listed yet.</p>
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* Other tabs like Activity, About etc. will go here */}
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <EntrepreneurHeroSection profile={profile} businesses={businesses} isOwnProfile={isOwnProfile} />
+      <EntrepreneurTabs
+        profile={profile}
+        businesses={businesses}
+        isOwnProfile={isOwnProfile}
+      />
     </div>
   );
-}
+};
 
 export default EntrepreneurProfileContent;
