@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -47,9 +46,14 @@ const CreateBusiness = () => {
       if (!user) throw new Error("You must be logged in to create a business.");
 
       const {
+        // These are separated for future file upload handling
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         governmentId,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         businessRegistration,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         proofOfAddress,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         bankStatement,
         ...businessData
       } = values;
@@ -59,6 +63,11 @@ const CreateBusiness = () => {
         .insert({
           ...businessData,
           user_id: user.id,
+          // Ensure optional fields are null if not provided, to match db schema
+          monthly_revenue: businessData.monthly_revenue ?? null,
+          monthly_expenses: businessData.monthly_expenses ?? null,
+          employees: businessData.employees ?? null,
+          use_of_funds: businessData.use_of_funds ?? null,
         })
         .select()
         .single();
