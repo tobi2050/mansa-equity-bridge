@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,16 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Calendar, MessageSquare } from "lucide-react";
+import { Plus, Users, Calendar, MessageSquare, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ValidationButton } from "./business/ValidationButton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link, useNavigate } from "react-router-dom";
 
 const BusinessListings = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
   const { data: businesses, isLoading: isLoadingBusinesses } = useQuery({
     queryKey: ['businesses'],
@@ -233,7 +234,9 @@ const BusinessListings = () => {
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="flex-1">
-                  <CardTitle className="text-lg">{business.title}</CardTitle>
+                  <CardTitle className="text-lg">
+                    <Link to={`/business/${business.id}`} className="hover:underline">{business.title}</Link>
+                  </CardTitle>
                   <CardDescription className="text-base mt-2">
                     {business.description}
                   </CardDescription>
@@ -316,6 +319,10 @@ const BusinessListings = () => {
                     className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
                   >
                     Edit Listing
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={() => navigate(`/business/${business.id}`)}>
+                    <Eye className="h-4 w-4 mr-1" />
+                    View Profile
                   </Button>
                 </div>
               </div>

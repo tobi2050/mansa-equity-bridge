@@ -38,21 +38,54 @@ export type Database = {
       businesses: {
         Row: {
           created_at: string
+          current_funding: number | null
           description: string | null
+          employees: string | null
+          funding_goal: number | null
           id: string
+          industry: string | null
+          location: string | null
+          monthly_expenses: number | null
+          monthly_revenue: number | null
           name: string
+          stage: string | null
+          use_of_funds: string | null
+          user_id: string | null
+          verified: boolean | null
         }
         Insert: {
           created_at?: string
+          current_funding?: number | null
           description?: string | null
+          employees?: string | null
+          funding_goal?: number | null
           id?: string
+          industry?: string | null
+          location?: string | null
+          monthly_expenses?: number | null
+          monthly_revenue?: number | null
           name: string
+          stage?: string | null
+          use_of_funds?: string | null
+          user_id?: string | null
+          verified?: boolean | null
         }
         Update: {
           created_at?: string
+          current_funding?: number | null
           description?: string | null
+          employees?: string | null
+          funding_goal?: number | null
           id?: string
+          industry?: string | null
+          location?: string | null
+          monthly_expenses?: number | null
+          monthly_revenue?: number | null
           name?: string
+          stage?: string | null
+          use_of_funds?: string | null
+          user_id?: string | null
+          verified?: boolean | null
         }
         Relationships: []
       }

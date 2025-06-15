@@ -172,7 +172,7 @@ const EntrepreneurProjects = () => {
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => navigate(`/business/${project.id}`)}>
                     <Eye className="w-4 h-4 mr-2" />
                     View
                   </Button>

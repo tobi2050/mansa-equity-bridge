@@ -27,6 +27,7 @@ import InvestmentForm from "./pages/InvestmentForm";
 import BiddingProcess from "./pages/BiddingProcess";
 import ConsortiumCreation from "./pages/ConsortiumCreation";
 import NotFound from "./pages/NotFound";
+import BusinessProfile from "./pages/BusinessProfile";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/investment-form/:id" element={<ProtectedRoute><InvestmentForm /></ProtectedRoute>} />
               <Route path="/bidding-process/:id" element={<ProtectedRoute><BiddingProcess /></ProtectedRoute>} />
               <Route path="/consortium-creation" element={<ProtectedRoute><ConsortiumCreation /></ProtectedRoute>} />
+              <Route path="/business/:businessId" element={<BusinessProfile />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

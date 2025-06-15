@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,34 +37,6 @@ const InvestmentOpportunities = () => {
       description: "Revolutionary farming technology platform connecting smallholder farmers with modern agricultural solutions.",
       riskLevel: "Medium",
       expectedROI: "18-25%"
-    },
-    {
-      id: 2,
-      title: "EduConnect Africa",
-      sector: "Education",
-      location: "Nairobi, Kenya",
-      fundingGoal: "$180,000",
-      raised: "$120,000",
-      progress: 67,
-      equity: "12%",
-      stage: "Seed",
-      description: "Digital learning platform providing quality education to underserved communities across Africa.",
-      riskLevel: "Low",
-      expectedROI: "15-22%"
-    },
-    {
-      id: 3,
-      title: "HealthTech Nigeria",
-      sector: "Healthcare",
-      location: "Abuja, Nigeria",
-      fundingGoal: "$400,000",
-      raised: "$50,000",
-      progress: 13,
-      equity: "20%",
-      stage: "Pre-Series A",
-      description: "Telemedicine platform connecting patients with healthcare providers in rural areas.",
-      riskLevel: "High",
-      expectedROI: "25-35%"
     }
   ];
 
@@ -79,7 +50,7 @@ const InvestmentOpportunities = () => {
   });
 
   const handleViewDetails = (opportunityId: number) => {
-    navigate(`/investment-details/${opportunityId}`);
+    navigate(`/business/${opportunityId}`);
   };
 
   return (
