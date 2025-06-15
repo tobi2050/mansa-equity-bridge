@@ -14,6 +14,7 @@ export type Database = {
           bio: string | null
           business_description: string | null
           business_name: string | null
+          default_contribution_mode: Database["public"]["Enums"]["contribution_mode"]
           full_name: string | null
           id: string
           industry_preferences: string[] | null
@@ -32,6 +33,7 @@ export type Database = {
           bio?: string | null
           business_description?: string | null
           business_name?: string | null
+          default_contribution_mode?: Database["public"]["Enums"]["contribution_mode"]
           full_name?: string | null
           id: string
           industry_preferences?: string[] | null
@@ -50,6 +52,7 @@ export type Database = {
           bio?: string | null
           business_description?: string | null
           business_name?: string | null
+          default_contribution_mode?: Database["public"]["Enums"]["contribution_mode"]
           full_name?: string | null
           id?: string
           industry_preferences?: string[] | null
@@ -74,6 +77,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      contribution_mode: "investing" | "donating"
       investor_motivation: "ROI-focused" | "Impact-focused" | "Mixed"
       investor_org_type: "Individual" | "NGO" | "Charity" | "Investment Firm"
       user_role: "entrepreneur" | "investor"
@@ -192,6 +196,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      contribution_mode: ["investing", "donating"],
       investor_motivation: ["ROI-focused", "Impact-focused", "Mixed"],
       investor_org_type: ["Individual", "NGO", "Charity", "Investment Firm"],
       user_role: ["entrepreneur", "investor"],

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -189,7 +188,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
               <div className="flex items-center gap-2 mt-1">
                 <Badge className="bg-white/20 text-white border-white/30">
                   <User className="w-3 h-3 mr-1" />
-                  Investor / Supporter
+                  Investor
                 </Badge>
               </div>
               <div className="flex items-center gap-4 mt-2 text-sm opacity-90">

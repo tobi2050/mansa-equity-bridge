@@ -17,6 +17,12 @@ import {
   Settings,
   Plus
 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 interface InvestorProfileProps {
   isOwnProfile?: boolean;
@@ -25,6 +31,55 @@ interface InvestorProfileProps {
 const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [profileCompletion] = useState(65); // Below 50% minimum
+  const { authState } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['profile', authState.user?.id],
+    queryFn: async () => {
+      if (!authState.user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('default_contribution_mode')
+        .eq('id', authState.user.id)
+        .single();
+      if (error && error.code !== 'PGRST116') { // Ignore error for no rows found
+        throw error;
+      }
+      return data;
+    },
+    enabled: isOwnProfile && !!authState.user?.id,
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updates: { default_contribution_mode: 'investing' | 'donating' }) => {
+      if (!authState.user?.id) throw new Error("User not found");
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', authState.user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', authState.user?.id] });
+      toast({
+        title: "Settings saved",
+        description: "Your profile settings have been updated.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error saving settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleModeChange = (value: 'investing' | 'donating') => {
+    updateProfileMutation.mutate({ default_contribution_mode: value });
+  };
   
   const investorStats = {
     totalInvested: "$125,000",
@@ -53,7 +108,7 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
         <CardContent className="p-6">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-blue-900">Supporter Dashboard</h1>
+              <h1 className="text-2xl font-bold text-blue-900">Investor Dashboard</h1>
               <p className="text-blue-700 mt-1">Manage your investment portfolio and discover opportunities</p>
             </div>
             {isOwnProfile && profileCompletion < 50 && (
@@ -83,11 +138,12 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-5' : 'grid-cols-4'}`}>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="consortiums">Consortiums</TabsTrigger>
+          {isOwnProfile && <TabsTrigger value="settings"><Settings className="w-4 h-4 mr-2" />Settings</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -210,7 +266,7 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
                         <Badge variant="outline">{opportunity.stage}</Badge>
                       </div>
                     </div>
-                    <Button>Place Bid</Button>
+                    <Button>Contribute</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -268,6 +324,42 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
             ))}
           </div>
         </TabsContent>
+        
+        {isOwnProfile && (
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Settings</CardTitle>
+                <CardDescription>Manage your investor profile settings.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoadingProfile ? (
+                  <p>Loading settings...</p>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="contribution-mode">Default Contribution Mode</Label>
+                    <Select
+                      value={profile?.default_contribution_mode || 'investing'}
+                      onValueChange={(value: 'investing' | 'donating') => handleModeChange(value)}
+                      disabled={updateProfileMutation.isPending}
+                    >
+                      <SelectTrigger id="contribution-mode" className="w-[280px]">
+                        <SelectValue placeholder="Select mode" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="investing">Investing</SelectItem>
+                        <SelectItem value="donating">Donating</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      Choose your default action when contributing to a project.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
