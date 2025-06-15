@@ -63,8 +63,15 @@ const UserProfile = () => {
         }
       }
 
-      // 4. Fetch businesses if entrepreneur
+      // 4. Fetch businesses and calculate stats if entrepreneur
       let businesses: any[] = [];
+      let aggregatedStats = {
+        totalCurrentFunding: 0,
+        totalFundingGoal: 0,
+        totalMonthlyRevenue: 0,
+        activeCampaigns: 0,
+      };
+
       if (profile && profile.role === 'entrepreneur') {
         const { data: businessData, error: businessError } = await supabase
           .from('businesses')
@@ -76,6 +83,15 @@ const UserProfile = () => {
           console.error("Error fetching businesses:", businessError);
         } else {
           businesses = businessData || [];
+          // Calculate aggregated stats
+          businesses.forEach(b => {
+            aggregatedStats.totalCurrentFunding += b.current_funding || 0;
+            aggregatedStats.totalFundingGoal += b.funding_goal || 0;
+            aggregatedStats.totalMonthlyRevenue += b.monthly_revenue || 0;
+            if ((b.funding_goal || 0) > 0 && (b.current_funding || 0) < b.funding_goal) {
+              aggregatedStats.activeCampaigns += 1;
+            }
+          });
         }
       }
       
@@ -85,6 +101,7 @@ const UserProfile = () => {
         followingCount: followingCount || 0,
         isFollowing,
         businesses,
+        aggregatedStats,
       };
     },
     enabled: !!profileId,

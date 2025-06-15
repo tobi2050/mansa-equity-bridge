@@ -1,12 +1,30 @@
 
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Building2 } from "lucide-react";
+import { CheckCircle, Building2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const BusinessPortfolioList = ({ businesses }: { businesses: any[] }) => {
+  const navigate = useNavigate();
+
   if (!businesses || businesses.length === 0)
-    return <div className="text-muted-foreground p-8 text-center">No businesses listed yet. Click "Add Business" to get started.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-16 px-6 border-2 border-dashed rounded-lg bg-card">
+        <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-4 text-lg font-medium">No businesses listed yet</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Click the button below to add your first business venture.
+        </p>
+        <div className="mt-6">
+          <Button onClick={() => navigate('/create-business')}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Business
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

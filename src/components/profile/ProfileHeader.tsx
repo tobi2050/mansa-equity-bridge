@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Edit, MessageCircle, Share2, MapPin, Calendar, Building2 } from "lucide-react";
 import { toast } from "sonner";
-import VerificationTrustSection from "./entrepreneur/VerificationTrustSection";
+import EntrepreneurStats from "./entrepreneur/EntrepreneurStats";
 
 type ProfileHeaderProps = {
   profile: any;
@@ -104,34 +104,35 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
             )}
           </div>
         </div>
-        <div className="mt-2">
-          <h1 className="text-2xl font-bold">{profile.full_name}</h1>
-          <p className="text-sm text-muted-foreground">@{profile.full_name?.toLowerCase().replace(/\s/g, '')}{/* A temporary username convention */}</p>
-        </div>
-        <p className="mt-2 text-foreground">{profile.bio}</p>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{profile.location || 'Not specified'}</span>
-          <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />Joined {new Date(profile.created_at || profile.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
-        </div>
-        <div className="flex items-center gap-4 mt-3 text-sm">
-          <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followingCount}</span> Following</span>
-          <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followerCount}</span> Followers</span>
-        </div>
 
-        {profile.role === 'entrepreneur' && (
-          <div className="mt-4 space-y-3 border-t pt-4">
-             <div className="flex items-center gap-4 text-sm">
-              <span className="flex items-center gap-1.5"><Building2 className="w-4 h-4" /> <span className="font-bold text-foreground">{businesses?.length || 0}</span> Businesses</span>
-            </div>
-            <VerificationTrustSection profile={profile} />
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 space-y-3">
+             <div>
+                <h1 className="text-2xl font-bold">{profile.full_name}</h1>
+                <p className="text-sm text-muted-foreground">@{profile.full_name?.toLowerCase().replace(/\s/g, '')}{/* A temporary username convention */}</p>
+             </div>
+             <div className="flex items-center gap-2">
+                <Badge variant={profile.role === 'investor' ? 'default' : 'secondary'} className="capitalize">
+                    <User className="w-3 h-3 mr-1" />
+                    {profile.role}
+                </Badge>
+             </div>
+             <p className="pt-2 text-foreground">{profile.bio}</p>
+             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{profile.location || 'Not specified'}</span>
+                <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />Joined {new Date(profile.created_at || profile.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+             </div>
+             <div className="flex items-center gap-4 pt-2 text-sm">
+                <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followingCount}</span> Following</span>
+                <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followerCount}</span> Followers</span>
+             </div>
           </div>
-        )}
-
-         <div className="mt-3">
-          <Badge variant={profile.role === 'investor' ? 'default' : 'secondary'} className="capitalize">
-            <User className="w-3 h-3 mr-1" />
-            {profile.role}
-          </Badge>
+          
+          {profile.role === 'entrepreneur' && (
+            <div className="md:col-span-1">
+              <EntrepreneurStats profile={profile} businesses={businesses || []} />
+            </div>
+          )}
         </div>
       </div>
     </div>
