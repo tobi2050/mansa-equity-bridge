@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { industryCategories } from "@/lib/constants";
+import type { SignUpFormData } from "./auth/types";
+import InvestorSignUpFields from "./auth/InvestorSignUpFields";
+import EntrepreneurSignUpFields from "./auth/EntrepreneurSignUpFields";
 
 interface SignUpFormProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ interface SignUpFormProps {
 
 const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps) => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SignUpFormData>({
     fullName: "",
     email: "",
     password: "",
@@ -29,7 +29,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     agreeToTerms: false,
     organizationType: "Individual",
     investmentMotivation: "ROI-focused",
-    industryPreferences: [] as {value: string, label: string}[],
+    industryPreferences: [],
     phoneNumber: "",
     defaultContributionMode: "investing",
   });
@@ -95,80 +95,6 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
       toast({ title: "Account Created!", description: "Please check your email for a confirmation link." });
       onSignUp(selectedRole);
     }
-  };
-
-  const renderRoleSpecificFields = () => {
-    if (selectedRole === 'investor') {
-      return (
-        <div className="space-y-6 p-4 bg-blue-50 rounded-lg border">
-          <div>
-            <Label>Your Organization Type</Label>
-            <Select value={formData.organizationType} onValueChange={(value) => setFormData({...formData, organizationType: value})}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Individual">Individual</SelectItem>
-                <SelectItem value="NGO">NGO</SelectItem>
-                <SelectItem value="Charity">Charity</SelectItem>
-                <SelectItem value="Investment Firm">Investment Firm</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Your Primary Motivation</Label>
-            <Select value={formData.investmentMotivation} onValueChange={(value) => setFormData({...formData, investmentMotivation: value})}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ROI-focused">ROI-focused</SelectItem>
-                <SelectItem value="Impact-focused">Impact-focused</SelectItem>
-                <SelectItem value="Mixed">Mixed (ROI & Impact)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Industries of Interest (up to 3)</Label>
-            <MultiSelect
-              options={industryCategories}
-              selected={formData.industryPreferences}
-              onChange={(value) => setFormData({...formData, industryPreferences: value})}
-              className="w-full"
-            />
-            <p className="text-xs text-gray-500 mt-1">Select your preferred investment sectors.</p>
-          </div>
-          <div>
-            <Label>Default Contribution Mode</Label>
-            <Select value={formData.defaultContributionMode} onValueChange={(value) => setFormData({...formData, defaultContributionMode: value})}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="investing">Investing</SelectItem>
-                <SelectItem value="donating">Donating</SelectItem>
-                <SelectItem value="supporting">Supporting</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">This will be your default action on projects.</p>
-          </div>
-        </div>
-      );
-    } else if (selectedRole === 'entrepreneur') {
-      return (
-        <div className="space-y-4 p-4 bg-green-50 rounded-lg border">
-          <p className="text-sm text-gray-600 mb-4">
-            You'll be able to add your business details from your profile after signing up.
-          </p>
-          <div>
-            <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number*</Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-              required
-            />
-          </div>
-        </div>
-      );
-    }
-    return null;
   };
 
   const safeSelectedRole = selectedRole || 'investor';
@@ -244,7 +170,8 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
             </Select>
           </div>
 
-          {renderRoleSpecificFields()}
+          {selectedRole === 'investor' && <InvestorSignUpFields formData={formData} setFormData={setFormData} />}
+          {selectedRole === 'entrepreneur' && <EntrepreneurSignUpFields formData={formData} setFormData={setFormData} />}
 
           <div className="flex items-center space-x-2">
             <Checkbox 
