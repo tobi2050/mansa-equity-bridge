@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,6 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     organizationType: "Individual",
     investmentMotivation: "ROI-focused",
     industryPreferences: [],
-    phoneNumber: "",
     defaultContributionMode: "investing",
   });
 
@@ -73,9 +73,6 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
             investment_motivation: formData.investmentMotivation,
             industry_preferences: formData.industryPreferences.map(p => p.value),
             default_contribution_mode: formData.defaultContributionMode,
-          }),
-          ...(selectedRole === 'entrepreneur' && {
-            phone_number: formData.phoneNumber,
           }),
         },
         emailRedirectTo: `${window.location.origin}/login`,
