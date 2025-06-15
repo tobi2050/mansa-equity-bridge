@@ -5,29 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { 
   User, 
   MapPin, 
   Calendar, 
-  TrendingUp, 
-  Building2, 
-  DollarSign,
-  Users,
   Edit,
   Share2,
   MessageCircle,
-  Star,
   ArrowLeft,
   Home
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import InvestorProfile from "./InvestorProfile";
-import PhilanthropistProfile from "./PhilanthropistProfile";
 
 interface UserProfileProps {
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
   isOwnProfile?: boolean;
 }
 
@@ -35,13 +27,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
   const navigate = useNavigate();
   const { userId } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
-  const [currentMode, setCurrentMode] = useState<'investor' | 'philanthropist'>(
-    userRole === 'investor' ? 'investor' : 'philanthropist'
-  );
   
-  // Simulate dual role capability - some users can be both investor and philanthropist
-  const isDualRole = userRole === 'investor'; // For demo, investors can also be philanthropists
-
   const profileData = {
     name: "Adaora Okwu",
     role: userRole,
@@ -50,12 +36,9 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
     profileImage: null,
     bio: userRole === 'entrepreneur' 
       ? "Building the future of African agriculture through innovative farming solutions and sustainable practices."
-      : userRole === 'investor'
-      ? "Passionate investor focused on supporting high-impact African businesses with sustainable growth potential."
-      : "Dedicated to supporting African entrepreneurs through impact-focused giving and community engagement."
+      : "Passionate about supporting high-impact African businesses with sustainable growth potential, as an individual, NGO, or investment firm."
   };
 
-  // If it's an entrepreneur profile, render the original entrepreneur interface
   if (userRole === 'entrepreneur') {
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
@@ -134,7 +117,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
           </div>
         </div>
 
-        {/* Entrepreneur Profile Content - Keep existing implementation */}
+        {/* Entrepreneur Profile Content */}
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Card>
             <CardHeader>
@@ -149,7 +132,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
     );
   }
 
-  // For investor and philanthropist profiles, render role-specific interfaces
+  // For investor profiles
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header with Navigation */}
@@ -192,11 +175,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
       </div>
 
       {/* Profile Header */}
-      <div className={`${
-        currentMode === 'investor' 
-          ? 'bg-gradient-to-r from-blue-500 to-indigo-600' 
-          : 'bg-gradient-to-r from-green-500 to-emerald-600'
-      } px-4 py-8`}>
+      <div className='bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-8'>
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <Avatar className="w-20 h-20 md:w-24 md:h-24 border-4 border-white">
@@ -210,13 +189,8 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
               <div className="flex items-center gap-2 mt-1">
                 <Badge className="bg-white/20 text-white border-white/30">
                   <User className="w-3 h-3 mr-1" />
-                  {currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
+                  Investor / Supporter
                 </Badge>
-                {isDualRole && (
-                  <Badge className="bg-white/10 text-white border-white/20">
-                    Dual Role
-                  </Badge>
-                )}
               </div>
               <div className="flex items-center gap-4 mt-2 text-sm opacity-90">
                 <span className="flex items-center gap-1">
@@ -234,20 +208,7 @@ const UserProfile = ({ userRole, isOwnProfile = false }: UserProfileProps) => {
         </div>
       </div>
 
-      {/* Role-specific Profile Content */}
-      {currentMode === 'investor' ? (
-        <InvestorProfile 
-          isOwnProfile={isOwnProfile}
-          isDualRole={isDualRole}
-          onTogglePhilanthropist={() => setCurrentMode('philanthropist')}
-        />
-      ) : (
-        <PhilanthropistProfile 
-          isOwnProfile={isOwnProfile}
-          isDualRole={isDualRole}
-          onToggleInvestor={() => setCurrentMode('investor')}
-        />
-      )}
+      <InvestorProfile isOwnProfile={isOwnProfile} />
     </div>
   );
 };

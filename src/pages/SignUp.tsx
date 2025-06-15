@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -48,15 +49,33 @@ const SignUp = () => {
 
     setIsLoading(true);
     
-    // Simulate signup process
-    setTimeout(() => {
-      setIsLoading(false);
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          full_name: `${formData.firstName} ${formData.lastName}`,
+          user_type: formData.userType,
+        },
+        emailRedirectTo: `${window.location.origin}/login`,
+      }
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
       toast({
         title: "Account Created Successfully",
-        description: "Please complete your profile",
+        description: "Please check your email for a confirmation link to complete your registration.",
       });
-      navigate("/complete-profile");
-    }, 1000);
+      navigate("/login");
+    }
   };
 
   return (
@@ -115,11 +134,7 @@ const SignUp = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="investor" id="investor" />
-                  <Label htmlFor="investor">Investor</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="philanthropist" id="philanthropist" />
-                  <Label htmlFor="philanthropist">Philanthropist</Label>
+                  <Label htmlFor="investor">Investor / Supporter</Label>
                 </div>
               </RadioGroup>
             </div>

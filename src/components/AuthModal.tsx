@@ -14,14 +14,14 @@ import { useAuth } from "@/contexts/AuthContext";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (role: 'investor' | 'entrepreneur' | 'philanthropist') => void;
+  onLogin: (role: 'investor' | 'entrepreneur') => void;
   defaultTab?: string;
-  defaultRole?: 'investor' | 'entrepreneur' | 'philanthropist';
+  defaultRole?: 'investor' | 'entrepreneur';
 }
 
 const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", defaultRole }: AuthModalProps) => {
   const { login } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | 'philanthropist' | null>(defaultRole || null);
+  const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | null>(defaultRole || null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showSignUpForm, setShowSignUpForm] = useState(false);
@@ -68,8 +68,10 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
         }}
         selectedRole={selectedRole}
         onSignUp={(role) => {
-          login(role);
+          login(role); // This might be for a temporary session before email confirmation
           onLogin(role);
+          setShowSignUpForm(false);
+          onClose();
         }}
       />
     );
@@ -109,7 +111,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
               )}
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <Card 
                 className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
                   selectedRole === 'investor' 
@@ -127,17 +129,17 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                       </div>
                     )}
                   </div>
-                  <CardTitle className="text-amber-800">Investor</CardTitle>
+                  <CardTitle className="text-amber-800">Investor / Supporter</CardTitle>
                   <CardDescription>
-                    Invest in African businesses and earn returns through equity ownership
+                    Invest in or donate to African businesses, from individuals to NGOs.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="text-sm space-y-2 text-gray-700">
-                    <li>• Minimum $20 investment</li>
+                    <li>• Equity investment or donations</li>
                     <li>• Form consortiums with other investors</li>
-                    <li>• Receive equity in businesses</li>
-                    <li>• Track milestone progress</li>
+                    <li>• Individuals, NGOs, Charities welcome</li>
+                    <li>• Track milestone progress & impact</li>
                   </ul>
                   <Badge className="mt-3 bg-green-100 text-green-800 border-green-200">
                     Open to All Nationalities
@@ -164,7 +166,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                   </div>
                   <CardTitle className="text-amber-800">Entrepreneur</CardTitle>
                   <CardDescription>
-                    Showcase your business and secure funding from global investors
+                    Showcase your business and secure funding from global supporters
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -176,41 +178,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                   </ul>
                   <Badge className="mt-3 bg-blue-100 text-blue-800 border-blue-200">
                     African Businesses Focus
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card 
-                className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
-                  selectedRole === 'philanthropist' 
-                    ? 'ring-2 ring-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500' 
-                    : 'border-amber-200 hover:border-amber-300'
-                } ${defaultRole === 'philanthropist' ? 'shadow-lg' : ''}`}
-                onClick={() => setSelectedRole('philanthropist')}
-              >
-                <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 relative">
-                    <User className="h-8 w-8 text-white" />
-                    {selectedRole === 'philanthropist' && (
-                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4 text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <CardTitle className="text-amber-800">Philanthropist</CardTitle>
-                  <CardDescription>
-                    Support African businesses through donations without expecting returns
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="text-sm space-y-2 text-gray-700">
-                    <li>• Make impact-focused donations</li>
-                    <li>• Support business growth</li>
-                    <li>• No equity expectations</li>
-                    <li>• Track social impact</li>
-                  </ul>
-                  <Badge className="mt-3 bg-purple-100 text-purple-800 border-purple-200">
-                    Impact-Focused Giving
                   </Badge>
                 </CardContent>
               </Card>
@@ -248,20 +215,16 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
                 <Label htmlFor="role" className="text-sm font-medium text-gray-700 mb-3 block">I am signing in as:</Label>
                 <RadioGroup 
                   value={selectedRole || ''} 
-                  onValueChange={(value) => setSelectedRole(value as 'investor' | 'entrepreneur' | 'philanthropist')}
+                  onValueChange={(value) => setSelectedRole(value as 'investor' | 'entrepreneur')}
                   className="flex flex-row justify-center gap-6"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="investor" id="investor" />
-                    <Label htmlFor="investor" className="text-sm">Investor</Label>
+                    <RadioGroupItem value="investor" id="investor-signin" />
+                    <Label htmlFor="investor-signin" className="text-sm">Investor / Supporter</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="entrepreneur" id="entrepreneur" />
-                    <Label htmlFor="entrepreneur" className="text-sm">Entrepreneur</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="philanthropist" id="philanthropist" />
-                    <Label htmlFor="philanthropist" className="text-sm">Philanthropist</Label>
+                    <RadioGroupItem value="entrepreneur" id="entrepreneur-signin" />
+                    <Label htmlFor="entrepreneur-signin" className="text-sm">Entrepreneur</Label>
                   </div>
                 </RadioGroup>
               </div>

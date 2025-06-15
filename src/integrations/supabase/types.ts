@@ -9,7 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          bio: string | null
+          business_description: string | null
+          business_name: string | null
+          full_name: string | null
+          id: string
+          industry_preferences: string[] | null
+          investment_motivation:
+            | Database["public"]["Enums"]["investor_motivation"]
+            | null
+          location: string | null
+          organization_type:
+            | Database["public"]["Enums"]["investor_org_type"]
+            | null
+          profile_image_url: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          full_name?: string | null
+          id: string
+          industry_preferences?: string[] | null
+          investment_motivation?:
+            | Database["public"]["Enums"]["investor_motivation"]
+            | null
+          location?: string | null
+          organization_type?:
+            | Database["public"]["Enums"]["investor_org_type"]
+            | null
+          profile_image_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          full_name?: string | null
+          id?: string
+          industry_preferences?: string[] | null
+          investment_motivation?:
+            | Database["public"]["Enums"]["investor_motivation"]
+            | null
+          location?: string | null
+          organization_type?:
+            | Database["public"]["Enums"]["investor_org_type"]
+            | null
+          profile_image_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +74,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      investor_motivation: "ROI-focused" | "Impact-focused" | "Mixed"
+      investor_org_type: "Individual" | "NGO" | "Charity" | "Investment Firm"
+      user_role: "entrepreneur" | "investor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +191,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      investor_motivation: ["ROI-focused", "Impact-focused", "Mixed"],
+      investor_org_type: ["Individual", "NGO", "Charity", "Investment Firm"],
+      user_role: ["entrepreneur", "investor"],
+    },
   },
 } as const

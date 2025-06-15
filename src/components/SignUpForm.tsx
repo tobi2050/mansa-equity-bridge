@@ -8,30 +8,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SignUpFormProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedRole: 'investor' | 'entrepreneur' | 'philanthropist';
-  onSignUp: (role: 'investor' | 'entrepreneur' | 'philanthropist') => void;
+  selectedRole: 'investor' | 'entrepreneur';
+  onSignUp: (role: 'investor' | 'entrepreneur') => void;
 }
 
+const industryCategories = [
+  "Agriculture & Agribusiness", "Financial Services & FinTech", "Healthcare & MedTech",
+  "Education & EdTech", "Renewable Energy & CleanTech", "Manufacturing & Processing",
+  "Retail & E-commerce", "Transportation & Logistics", "Tourism & Hospitality",
+  "Creative Industries & Media"
+];
+
 const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps) => {
-  console.log('SignUpForm rendered with selectedRole:', selectedRole);
-  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
     agreeToTerms: false,
-    primaryInterest: "investing",
-    alsoInterestedInPhilanthropy: false
+    organizationType: "Individual",
+    investmentMotivation: "ROI-focused",
+    industryPreferences: [] as string[],
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match");
@@ -41,44 +49,94 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
       alert("Please agree to terms and privacy policy");
       return;
     }
-    onSignUp(selectedRole);
+    
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          full_name: formData.fullName,
+          user_type: selectedRole,
+          ...(selectedRole === 'investor' && {
+            organization_type: formData.organizationType,
+            investment_motivation: formData.investmentMotivation,
+            industry_preferences: formData.industryPreferences,
+          }),
+        },
+        emailRedirectTo: `${window.location.origin}/login`,
+      },
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      alert(`Sign up failed: ${error.message}`);
+    } else {
+      alert("Account Created! Please check your email for a confirmation link.");
+      onSignUp(selectedRole);
+    }
   };
 
   const renderRoleSpecificFields = () => {
     if (selectedRole === 'investor') {
       return (
-        <div className="space-y-4 p-4 bg-green-50 rounded-lg border">
-          <Label className="text-sm font-medium">My primary interest is:</Label>
-          <RadioGroup value={formData.primaryInterest} onValueChange={(value) => setFormData({...formData, primaryInterest: value})}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="investing" id="investing" />
-              <Label htmlFor="investing" className="text-sm">Investing (seeking equity returns)</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="philanthropy" id="philanthropy" />
-              <Label htmlFor="philanthropy" className="text-sm">Philanthropy (donations only)</Label>
-            </div>
-          </RadioGroup>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="alsoPhilanthropy" 
-              checked={formData.alsoInterestedInPhilanthropy}
-              onCheckedChange={(checked) => setFormData({...formData, alsoInterestedInPhilanthropy: checked as boolean})}
-            />
-            <Label htmlFor="alsoPhilanthropy" className="text-sm">I am also interested in Philanthropy (can make donations)</Label>
+        <div className="space-y-6 p-4 bg-blue-50 rounded-lg border">
+          <div>
+            <Label>Your Organization Type</Label>
+            <Select value={formData.organizationType} onValueChange={(value) => setFormData({...formData, organizationType: value})}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Individual">Individual</SelectItem>
+                <SelectItem value="NGO">NGO</SelectItem>
+                <SelectItem value="Charity">Charity</SelectItem>
+                <SelectItem value="Investment Firm">Investment Firm</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          
-          <p className="text-xs text-gray-600">
-            You'll start with Red Tier (Free). Verification and a minimum deposit may be required for full investment features.
-          </p>
+          <div>
+            <Label>Your Primary Motivation</Label>
+            <Select value={formData.investmentMotivation} onValueChange={(value) => setFormData({...formData, investmentMotivation: value})}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ROI-focused">ROI-focused</SelectItem>
+                <SelectItem value="Impact-focused">Impact-focused</SelectItem>
+                <SelectItem value="Mixed">Mixed (ROI & Impact)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Industries of Interest (up to 3)</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {industryCategories.map(industry => (
+                <div key={industry} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={industry}
+                    checked={formData.industryPreferences.includes(industry)}
+                    onCheckedChange={(checked) => {
+                      const currentPrefs = formData.industryPreferences;
+                      if (checked) {
+                        if (currentPrefs.length < 3) {
+                          setFormData({...formData, industryPreferences: [...currentPrefs, industry]});
+                        }
+                      } else {
+                        setFormData({...formData, industryPreferences: currentPrefs.filter(item => item !== industry)});
+                      }
+                    }}
+                  />
+                  <Label htmlFor={industry} className="text-sm font-normal">{industry}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       );
     } else if (selectedRole === 'entrepreneur') {
       return (
         <div className="space-y-4 p-4 bg-blue-50 rounded-lg border">
           <p className="text-sm text-gray-600">
-            You'll be able to add your business details from your profile after signing up. Entrepreneurs get Green Tier (Free) access.
+            You'll be able to add your business details from your profile after signing up.
           </p>
         </div>
       );
@@ -86,9 +144,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     return null;
   };
 
-  // Ensure selectedRole is never empty or undefined
   const safeSelectedRole = selectedRole || 'investor';
-  console.log('Using safeSelectedRole:', safeSelectedRole);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -177,8 +233,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="entrepreneur">Entrepreneur</SelectItem>
-                <SelectItem value="investor">Investor</SelectItem>
-                <SelectItem value="philanthropist">Philanthropist</SelectItem>
+                <SelectItem value="investor">Investor / Supporter</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -199,8 +254,9 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
           <Button 
             type="submit"
             className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-3"
+            disabled={isLoading}
           >
-            Create Account
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
 
           <div className="text-center">

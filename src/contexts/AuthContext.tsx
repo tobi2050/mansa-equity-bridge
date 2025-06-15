@@ -1,15 +1,14 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthState {
   isAuthenticated: boolean;
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist' | null;
+  userRole: 'investor' | 'entrepreneur' | null;
   userId: string | null;
 }
 
 interface AuthContextType {
   authState: AuthState;
-  login: (role: 'investor' | 'entrepreneur' | 'philanthropist') => void;
+  login: (role: 'investor' | 'entrepreneur') => void;
   logout: () => void;
   isLoading: boolean;
 }
@@ -39,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = (role: 'investor' | 'entrepreneur' | 'philanthropist') => {
+  const login = (role: 'investor' | 'entrepreneur') => {
     const newAuthState = {
       isAuthenticated: true,
       userRole: role,

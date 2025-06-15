@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,11 +20,9 @@ import {
 
 interface InvestorProfileProps {
   isOwnProfile?: boolean;
-  onTogglePhilanthropist?: () => void;
-  isDualRole?: boolean;
 }
 
-const InvestorProfile = ({ isOwnProfile = false, onTogglePhilanthropist, isDualRole = false }: InvestorProfileProps) => {
+const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [profileCompletion] = useState(65); // Below 50% minimum
   
@@ -56,18 +53,8 @@ const InvestorProfile = ({ isOwnProfile = false, onTogglePhilanthropist, isDualR
         <CardContent className="p-6">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-blue-900">Investor Dashboard</h1>
+              <h1 className="text-2xl font-bold text-blue-900">Supporter Dashboard</h1>
               <p className="text-blue-700 mt-1">Manage your investment portfolio and discover opportunities</p>
-              {isDualRole && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onTogglePhilanthropist}
-                  className="mt-2 border-blue-500 text-blue-700"
-                >
-                  Switch to Philanthropist Mode
-                </Button>
-              )}
             </div>
             {isOwnProfile && profileCompletion < 50 && (
               <Badge variant="destructive">Profile Incomplete</Badge>
@@ -110,14 +97,14 @@ const InvestorProfile = ({ isOwnProfile = false, onTogglePhilanthropist, isDualR
               <CardContent className="pt-6 text-center">
                 <DollarSign className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-blue-600">{investorStats.totalInvested}</div>
-                <div className="text-xs text-gray-600">Total Invested</div>
+                <div className="text-xs text-gray-600">Total Contributed</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <Building2 className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-green-600">{investorStats.activeInvestments}</div>
-                <div className="text-xs text-gray-600">Active Investments</div>
+                <div className="text-xs text-gray-600">Active Projects</div>
               </CardContent>
             </Card>
             <Card>
@@ -167,7 +154,7 @@ const InvestorProfile = ({ isOwnProfile = false, onTogglePhilanthropist, isDualR
                 </Button>
                 <Button variant="outline" className="h-20 flex flex-col gap-2">
                   <DollarSign className="w-6 h-6" />
-                  <span className="text-xs">Place Bid</span>
+                  <span className="text-xs">Contribute</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex flex-col gap-2">
                   <MessageCircle className="w-6 h-6" />
