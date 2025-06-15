@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import BusinessPortfolioList from "./BusinessPortfolioList";
 import InvestorEngagementSection from "./InvestorEngagementSection";
-import PerformanceAnalyticsSection from "./PerformanceAnalyticsSection";
 
 type EntrepreneurTabsProps = {
   profile: any;
@@ -22,7 +21,6 @@ const EntrepreneurTabs = ({ profile, businesses, isOwnProfile }: EntrepreneurTab
         <TabsList className="bg-transparent border-b-0 p-0">
           <TabsTrigger value="portfolio" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Portfolio</TabsTrigger>
           <TabsTrigger value="activity" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Investor Engagement</TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Performance</TabsTrigger>
         </TabsList>
         {isOwnProfile && (
           <Button variant="outline" size="sm" onClick={() => navigate('/create-business')}>
@@ -36,9 +34,6 @@ const EntrepreneurTabs = ({ profile, businesses, isOwnProfile }: EntrepreneurTab
       </TabsContent>
       <TabsContent value="activity">
         <InvestorEngagementSection businesses={businesses} />
-      </TabsContent>
-      <TabsContent value="analytics">
-        <PerformanceAnalyticsSection businesses={businesses} />
       </TabsContent>
     </Tabs>
   );
