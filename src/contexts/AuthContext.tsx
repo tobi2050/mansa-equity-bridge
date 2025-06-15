@@ -37,16 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSessionAndProfile = async () => {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error("Error getting session:", sessionError);
-        setIsLoading(false);
-        return;
-      }
-
-      setSession(session);
-
+    const fetchUserAndProfile = async (session: Session | null) => {
       if (session?.user) {
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
@@ -55,42 +46,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .single();
 
         if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile on initial load:', profileError);
+          console.error('Error fetching profile:', profileError);
+          setProfile(null);
         } else {
           setProfile(userProfile as UserProfile | null);
         }
+      } else {
+        setProfile(null);
       }
       setIsLoading(false);
     };
 
-    fetchSessionAndProfile();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Get initial session and profile
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      
-      if (_event === 'SIGNED_OUT') {
-        setProfile(null);
-      } else if (session?.user && session.user.id !== profile?.id) {
-        setIsLoading(true);
-        const { data: userProfile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, role, full_name, default_contribution_mode, email_verified, phone_verified, identity_verified, business_verified, trust_score')
-          .eq('id', session.user.id)
-          .single();
+      fetchUserAndProfile(session);
+    });
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile on auth state change:', profileError);
-        } else {
-          setProfile(userProfile as UserProfile | null);
-        }
-        setIsLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Defer profile fetching to avoid potential deadlocks
+        setTimeout(() => {
+          setIsLoading(true);
+          fetchUserAndProfile(session);
+        }, 0);
+      } else if (event === 'SIGNED_OUT') {
+        setProfile(null);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [profile?.id]);
+  }, []);
 
   const logout = async () => {
     await supabase.auth.signOut();
