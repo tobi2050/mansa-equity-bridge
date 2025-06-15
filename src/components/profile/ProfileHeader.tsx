@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,15 +93,8 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
           <img src={profile.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
         )}
       </div>
-      <div className="p-4 bg-card border-b">
-        <div className="flex justify-between items-start -mt-12 md:-mt-16">
-          <Avatar className="w-20 h-20 md:w-24 md:h-24 border-4 border-card">
-            <AvatarImage src={profile.profile_image_url} alt={profile.full_name} />
-            <AvatarFallback className="text-2xl font-bold">
-              {profile.full_name?.split(' ').map((n: string) => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex gap-2 pt-12 md:pt-16">
+      <div className="p-4 bg-card border-b relative">
+        <div className="absolute top-4 right-4 flex gap-2">
             {isOwnProfile ? (
               <Button variant="outline" onClick={() => navigate('/complete-profile')}>
                 <Edit className="w-4 h-4 mr-2" />
@@ -115,27 +109,35 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
                 <Button variant="ghost" size="icon"><Share2 className="w-4 h-4" /></Button>
               </>
             )}
-          </div>
+        </div>
+        
+        <div className="flex justify-center -mt-12 md:-mt-16">
+          <Avatar className="w-20 h-20 md:w-24 md:h-24 border-4 border-card">
+            <AvatarImage src={profile.profile_image_url} alt={profile.full_name} />
+            <AvatarFallback className="text-2xl md:text-3xl font-bold">
+              {profile.full_name?.split(' ').map((n: string) => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 text-center">
           <div className="space-y-3">
              <div>
                 <h1 className="text-2xl font-bold">{profile.full_name}</h1>
                 <p className="text-sm text-muted-foreground">@{profile.full_name?.toLowerCase().replace(/\s/g, '')}{/* A temporary username convention */}</p>
              </div>
-             <div className="flex items-center gap-2">
+             <div className="flex items-center justify-center gap-2">
                 <Badge variant={profile.role === 'investor' ? 'default' : 'secondary'} className="capitalize">
                     <User className="w-3 h-3 mr-1" />
                     {profile.role}
                 </Badge>
              </div>
              <p className="pt-2 text-foreground">{profile.bio}</p>
-             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{profile.location || 'Not specified'}</span>
                 <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />Joined {new Date(profile.created_at || profile.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
              </div>
-             <div className="flex items-center gap-4 pt-2 text-sm">
+             <div className="flex items-center justify-center gap-4 pt-2 text-sm">
                 <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followingCount}</span> Following</span>
                 <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followerCount}</span> Followers</span>
              </div>
