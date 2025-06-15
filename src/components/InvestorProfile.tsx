@@ -1,11 +1,7 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings } from "lucide-react";
-import { InvestorDashboardHeader } from "./investor-profile/InvestorDashboardHeader";
 import { OverviewTab } from "./investor-profile/OverviewTab";
 import { OpportunitiesTab } from "./investor-profile/OpportunitiesTab";
 import { PortfolioTab } from "./investor-profile/PortfolioTab";
@@ -14,31 +10,12 @@ import { SettingsTab } from "./investor-profile/SettingsTab";
 
 interface InvestorProfileProps {
   isOwnProfile?: boolean;
+  profile?: any;
+  isLoading?: boolean;
 }
 
-const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
+const InvestorProfile = ({ isOwnProfile = false, profile, isLoading }: InvestorProfileProps) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [profileCompletion] = useState(65); // Below 50% minimum
-
-  const { authState } = useAuth();
-  const { data: profile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ['profile', authState.userId],
-    queryFn: async () => {
-      if (!authState.userId) return null;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('default_contribution_mode')
-        .eq('id', authState.userId)
-        .maybeSingle();
-      
-      if (error) {
-        console.error("Error fetching investor profile:", error);
-        throw error;
-      }
-      return data;
-    },
-    enabled: !!authState.userId && isOwnProfile,
-  });
 
   const investorStats = {
     totalInvested: "$125,000",
@@ -61,9 +38,7 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <InvestorDashboardHeader isOwnProfile={isOwnProfile} profileCompletion={profileCompletion} />
-
+    <div className="max-w-6xl mx-auto space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-5' : 'grid-cols-4'}`}>
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -74,7 +49,7 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
         </TabsList>
 
         <TabsContent value="overview">
-          {isOwnProfile && isLoadingProfile ? (
+          {isOwnProfile && isLoading ? (
             <div className="text-center p-8">Loading...</div>
           ) : (
             <OverviewTab
