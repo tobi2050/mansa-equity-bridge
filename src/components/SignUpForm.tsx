@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { industryCategories } from "@/lib/constants";
 
 interface SignUpFormProps {
   isOpen: boolean;
@@ -16,13 +18,6 @@ interface SignUpFormProps {
   selectedRole: 'investor' | 'entrepreneur';
   onSignUp: (role: 'investor' | 'entrepreneur') => void;
 }
-
-const industryCategories = [
-  "Agriculture & Agribusiness", "Financial Services & FinTech", "Healthcare & MedTech",
-  "Education & EdTech", "Renewable Energy & CleanTech", "Manufacturing & Processing",
-  "Retail & E-commerce", "Transportation & Logistics", "Tourism & Hospitality",
-  "Creative Industries & Media"
-].map(industry => ({ value: industry, label: industry }));
 
 const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps) => {
   const { toast } = useToast();
@@ -35,7 +30,8 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     organizationType: "Individual",
     investmentMotivation: "ROI-focused",
     industryPreferences: [] as {value: string, label: string}[],
-    phoneNumber: ""
+    phoneNumber: "",
+    defaultContributionMode: "investing",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -76,6 +72,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
             organization_type: formData.organizationType,
             investment_motivation: formData.investmentMotivation,
             industry_preferences: formData.industryPreferences.map(p => p.value),
+            default_contribution_mode: formData.defaultContributionMode,
           }),
           ...(selectedRole === 'entrepreneur' && {
             phone_number: formData.phoneNumber,
@@ -136,6 +133,18 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
               className="w-full"
             />
             <p className="text-xs text-gray-500 mt-1">Select your preferred investment sectors.</p>
+          </div>
+          <div>
+            <Label>Default Contribution Mode</Label>
+            <Select value={formData.defaultContributionMode} onValueChange={(value) => setFormData({...formData, defaultContributionMode: value})}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="investing">Investing</SelectItem>
+                <SelectItem value="donating">Donating</SelectItem>
+                <SelectItem value="supporting">Supporting</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500 mt-1">This will be your default action on projects.</p>
           </div>
         </div>
       );
