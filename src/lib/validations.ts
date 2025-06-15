@@ -1,4 +1,3 @@
-
 import * as z from 'zod';
 
 // Password strength validation
@@ -50,4 +49,18 @@ export const SignUpFormSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match.",
   path: ["confirmPassword"],
+});
+
+// Create Business Schema
+export const CreateBusinessSchema = z.object({
+  name: z.string().min(3, { message: "Business name must be at least 3 characters." }),
+  industry: z.string().min(1, { message: "Industry is required." }),
+  stage: z.string().min(1, { message: "Business stage is required." }),
+  location: z.string().min(1, { message: "Location is required." }),
+  description: z.string().min(20, { message: "Description must be at least 20 characters." }),
+  funding_goal: z.coerce.number().positive({ message: "Funding goal must be a positive number." }),
+  monthly_revenue: z.coerce.number().min(0, { message: "Monthly revenue cannot be negative." }).optional(),
+  monthly_expenses: z.coerce.number().min(0, { message: "Monthly expenses cannot be negative." }).optional(),
+  employees: z.string().optional(),
+  use_of_funds: z.string().optional(),
 });
