@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigation } from "@/contexts/NavigationContext";
 
 interface BottomNavigationProps {
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
 }
 
 const BottomNavigation = ({ userRole }: BottomNavigationProps) => {

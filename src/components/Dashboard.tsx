@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigation } from "@/contexts/NavigationContext";
 
 interface DashboardProps {
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
   onLogout: () => void;
 }
 
@@ -161,7 +160,7 @@ const Dashboard = ({ userRole, onLogout }: DashboardProps) => {
         </div>
       );
     } else {
-      // Investor/Philanthropist dashboard
+      // Investor dashboard
       return (
         <div className="space-y-6">
           {/* Welcome banner */}
