@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -38,18 +37,29 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     industryPreferences: [] as {value: string, label: string}[],
     phoneNumber: ""
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
-      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
       return;
     }
+
     if (!formData.agreeToTerms) {
-      toast({ title: "Error", description: "Please agree to the terms and privacy policy.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "You must agree to the terms and conditions.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -78,7 +88,12 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     setIsLoading(false);
 
     if (error) {
-      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+      console.error("Error signing up:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } else {
       toast({ title: "Account Created!", description: "Please check your email for a confirmation link." });
       onSignUp(selectedRole);
@@ -152,82 +167,61 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="text-center">
-          <div className="w-20 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-lg">MANSA</span>
-          </div>
-          <DialogTitle className="text-2xl font-bold">Create Your MANSA Account</DialogTitle>
+        <DialogHeader>
+          <DialogTitle className="text-center text-2xl font-bold text-amber-600">
+            Create Your {selectedRole === 'investor' ? 'Investor' : 'Entrepreneur'} Account
+          </DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="fullName" className="text-sm font-medium">Full Name*</Label>
-              <Input
-                id="fullName"
-                value={formData.fullName}
-                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email" className="text-sm font-medium">Email Address*</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-              />
-            </div>
+          <div>
+            <Label htmlFor="fullName" className="text-sm font-medium">Full Name*</Label>
+            <Input
+              id="fullName"
+              placeholder="e.g. Adaora Okwu"
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              required
+            />
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="password" className="text-sm font-medium">Password*</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Min. 8 characters</p>
-            </div>
-            <div>
-              <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password*</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
-              </div>
-            </div>
+          <div>
+            <Label htmlFor="email" className="text-sm font-medium">Email*</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
           </div>
-
+          <div className="relative">
+            <Label htmlFor="password">Password*</Label>
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-8 text-gray-500">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          <div className="relative">
+            <Label htmlFor="confirmPassword">Confirm Password*</Label>
+            <Input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              required
+            />
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-8 text-gray-500">
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           <div>
             <Label htmlFor="role" className="text-sm font-medium">I am registering as an...*</Label>
             <Select value={safeSelectedRole} disabled>

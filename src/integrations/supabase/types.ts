@@ -72,6 +72,7 @@ export type Database = {
           organization_type:
             | Database["public"]["Enums"]["investor_org_type"]
             | null
+          phone_number: string | null
           profile_image_url: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
@@ -91,6 +92,7 @@ export type Database = {
           organization_type?:
             | Database["public"]["Enums"]["investor_org_type"]
             | null
+          phone_number?: string | null
           profile_image_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           organization_type?:
             | Database["public"]["Enums"]["investor_org_type"]
             | null
+          phone_number?: string | null
           profile_image_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
