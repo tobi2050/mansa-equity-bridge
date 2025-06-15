@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +21,8 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
 
   const handleFollow = async () => {
     if (!user) return;
-    const { error } = await supabase.from('followers').insert({
+    // Use 'as any' to allow insertion into the new followers table
+    const { error } = await (supabase as any).from('followers').insert({
       follower_id: user.id,
       following_id: profile.id,
     });
@@ -34,7 +34,7 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
 
   const handleUnfollow = async () => {
     if (!user) return;
-    const { error } = await supabase.from('followers').delete()
+    const { error } = await (supabase as any).from('followers').delete()
       .eq('follower_id', user.id)
       .eq('following_id', profile.id);
     if (error) {

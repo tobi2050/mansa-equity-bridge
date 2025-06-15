@@ -33,14 +33,14 @@ const UserProfile = () => {
       }
 
       // 2. Fetch follower and following counts
-      const { count: followerCount, error: followerError } = await supabase
+      const { count: followerCount, error: followerError } = await (supabase as any)
         .from('followers')
         .select('*', { count: 'exact', head: true })
         .eq('following_id', profileId);
       
       if (followerError) console.error("Error fetching follower count:", followerError);
 
-      const { count: followingCount, error: followingError } = await supabase
+      const { count: followingCount, error: followingError } = await (supabase as any)
         .from('followers')
         .select('*', { count: 'exact', head: true })
         .eq('follower_id', profileId);
@@ -50,7 +50,7 @@ const UserProfile = () => {
       // 3. Check if current user is following this profile
       let isFollowing = false;
       if (user && !isOwnProfile) {
-        const { data: followingData, error: followingCheckError } = await supabase
+        const { data: followingData, error: followingCheckError } = await (supabase as any)
           .from('followers')
           .select('follower_id', { count: 'exact' })
           .eq('follower_id', user.id)
@@ -119,3 +119,4 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+
