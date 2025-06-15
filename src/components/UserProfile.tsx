@@ -62,12 +62,29 @@ const UserProfile = () => {
           isFollowing = true;
         }
       }
+
+      // 4. Fetch businesses if entrepreneur
+      let businesses: any[] = [];
+      if (profile && profile.role === 'entrepreneur') {
+        const { data: businessData, error: businessError } = await supabase
+          .from('businesses')
+          .select('*')
+          .eq('user_id', profileId)
+          .order('created_at', { ascending: false });
+
+        if (businessError) {
+          console.error("Error fetching businesses:", businessError);
+        } else {
+          businesses = businessData || [];
+        }
+      }
       
       return { 
         ...profile,
         followerCount: followerCount || 0,
         followingCount: followingCount || 0,
-        isFollowing
+        isFollowing,
+        businesses,
       };
     },
     enabled: !!profileId,
@@ -97,6 +114,7 @@ const UserProfile = () => {
     <div className="min-h-screen bg-background pb-20">
       <ProfileHeader
         profile={profileData}
+        businesses={profileData.businesses}
         isOwnProfile={isOwnProfile}
         isFollowing={profileData.isFollowing}
         followerCount={profileData.followerCount}
@@ -111,7 +129,11 @@ const UserProfile = () => {
             isLoading={isLoading}
           />
         ) : (
-          <EntrepreneurProfileContent isOwnProfile={isOwnProfile} />
+          <EntrepreneurProfileContent 
+            isOwnProfile={isOwnProfile} 
+            profile={profileData} 
+            businesses={profileData.businesses || []}
+          />
         )}
       </div>
     </div>

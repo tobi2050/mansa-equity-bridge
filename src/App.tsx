@@ -28,6 +28,12 @@ import BiddingProcess from "./pages/BiddingProcess";
 import ConsortiumCreation from "./pages/ConsortiumCreation";
 import NotFound from "./pages/NotFound";
 import BusinessProfile from "./pages/BusinessProfile";
+import CreateBusiness from "./pages/CreateBusiness";
+import CreateProject from "./pages/CreateProject";
+import CreateUpdate from "./pages/CreateUpdate";
+import CreateMilestone from "./pages/CreateMilestone";
+import CreateAnnouncement from "./pages/CreateAnnouncement";
+import AddTeamMember from "./pages/AddTeamMember";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +67,14 @@ const App = () => (
               <Route path="/bidding-process/:id" element={<ProtectedRoute><BiddingProcess /></ProtectedRoute>} />
               <Route path="/consortium-creation" element={<ProtectedRoute><ConsortiumCreation /></ProtectedRoute>} />
               <Route path="/business/:businessId" element={<BusinessProfile />} />
+
+              {/* Create Routes */}
+              <Route path="/create-business" element={<ProtectedRoute><CreateBusiness /></ProtectedRoute>} />
+              <Route path="/create-project" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
+              <Route path="/create-update" element={<ProtectedRoute><CreateUpdate /></ProtectedRoute>} />
+              <Route path="/create-milestone" element={<ProtectedRoute><CreateMilestone /></ProtectedRoute>} />
+              <Route path="/create-announcement" element={<ProtectedRoute><CreateAnnouncement /></ProtectedRoute>} />
+              <Route path="/add-team-member" element={<ProtectedRoute><AddTeamMember /></ProtectedRoute>} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

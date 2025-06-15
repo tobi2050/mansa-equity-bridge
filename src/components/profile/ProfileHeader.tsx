@@ -4,8 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, MessageCircle, Share2, MapPin, Calendar } from "lucide-react";
+import { User, Edit, MessageCircle, Share2, MapPin, Calendar, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import VerificationTrustSection from "./entrepreneur/VerificationTrustSection";
 
 type ProfileHeaderProps = {
   profile: any;
@@ -13,9 +14,10 @@ type ProfileHeaderProps = {
   isFollowing: boolean;
   followerCount: number;
   followingCount: number;
+  businesses?: any[];
 };
 
-export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCount, followingCount }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCount, followingCount, businesses }: ProfileHeaderProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -115,6 +117,16 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
           <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followingCount}</span> Following</span>
           <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followerCount}</span> Followers</span>
         </div>
+
+        {profile.role === 'entrepreneur' && (
+          <div className="mt-4 space-y-3 border-t pt-4">
+             <div className="flex items-center gap-4 text-sm">
+              <span className="flex items-center gap-1.5"><Building2 className="w-4 h-4" /> <span className="font-bold text-foreground">{businesses?.length || 0}</span> Businesses</span>
+            </div>
+            <VerificationTrustSection profile={profile} />
+          </div>
+        )}
+
          <div className="mt-3">
           <Badge variant={profile.role === 'investor' ? 'default' : 'secondary'} className="capitalize">
             <User className="w-3 h-3 mr-1" />
