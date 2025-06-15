@@ -20,8 +20,11 @@ export const SettingsTab = () => {
         .from('profiles')
         .select('default_contribution_mode')
         .eq('id', authState.userId)
-        .single();
-      if (error && error.code !== 'PGRST116') { // Ignore error for no rows found
+        .maybeSingle(); // Use maybeSingle to prevent error if no row found
+      
+      if (error) {
+        // maybeSingle handles the 'PGRST116' (0 rows) case by returning null.
+        // We only throw for other, unexpected errors.
         throw error;
       }
       return data;

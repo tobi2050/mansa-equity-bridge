@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 interface SignUpFormProps {
   isOpen: boolean;
@@ -22,9 +23,10 @@ const industryCategories = [
   "Education & EdTech", "Renewable Energy & CleanTech", "Manufacturing & Processing",
   "Retail & E-commerce", "Transportation & Logistics", "Tourism & Hospitality",
   "Creative Industries & Media"
-];
+].map(industry => ({ value: industry, label: industry }));
 
 const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -33,7 +35,8 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     agreeToTerms: false,
     organizationType: "Individual",
     investmentMotivation: "ROI-focused",
-    industryPreferences: [] as string[],
+    industryPreferences: [] as {value: string, label: string}[],
+    phoneNumber: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,11 +45,11 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match");
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
       return;
     }
     if (!formData.agreeToTerms) {
-      alert("Please agree to terms and privacy policy");
+      toast({ title: "Error", description: "Please agree to the terms and privacy policy.", variant: "destructive" });
       return;
     }
     
@@ -62,7 +65,10 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
           ...(selectedRole === 'investor' && {
             organization_type: formData.organizationType,
             investment_motivation: formData.investmentMotivation,
-            industry_preferences: formData.industryPreferences,
+            industry_preferences: formData.industryPreferences.map(p => p.value),
+          }),
+          ...(selectedRole === 'entrepreneur' && {
+            phone_number: formData.phoneNumber,
           }),
         },
         emailRedirectTo: `${window.location.origin}/login`,
@@ -72,9 +78,9 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
     setIsLoading(false);
 
     if (error) {
-      alert(`Sign up failed: ${error.message}`);
+      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
     } else {
-      alert("Account Created! Please check your email for a confirmation link.");
+      toast({ title: "Account Created!", description: "Please check your email for a confirmation link." });
       onSignUp(selectedRole);
     }
   };
@@ -108,36 +114,33 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
           </div>
           <div>
             <Label>Industries of Interest (up to 3)</Label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {industryCategories.map(industry => (
-                <div key={industry} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={industry}
-                    checked={formData.industryPreferences.includes(industry)}
-                    onCheckedChange={(checked) => {
-                      const currentPrefs = formData.industryPreferences;
-                      if (checked) {
-                        if (currentPrefs.length < 3) {
-                          setFormData({...formData, industryPreferences: [...currentPrefs, industry]});
-                        }
-                      } else {
-                        setFormData({...formData, industryPreferences: currentPrefs.filter(item => item !== industry)});
-                      }
-                    }}
-                  />
-                  <Label htmlFor={industry} className="text-sm font-normal">{industry}</Label>
-                </div>
-              ))}
-            </div>
+            <MultiSelect
+              options={industryCategories}
+              selected={formData.industryPreferences}
+              onChange={(value) => setFormData({...formData, industryPreferences: value})}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500 mt-1">Select your preferred investment sectors.</p>
           </div>
         </div>
       );
     } else if (selectedRole === 'entrepreneur') {
       return (
-        <div className="space-y-4 p-4 bg-blue-50 rounded-lg border">
-          <p className="text-sm text-gray-600">
+        <div className="space-y-4 p-4 bg-green-50 rounded-lg border">
+          <p className="text-sm text-gray-600 mb-4">
             You'll be able to add your business details from your profile after signing up.
           </p>
+          <div>
+            <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number*</Label>
+            <Input
+              id="phoneNumber"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+              required
+            />
+          </div>
         </div>
       );
     }

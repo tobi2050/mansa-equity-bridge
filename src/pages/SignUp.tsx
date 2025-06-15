@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,8 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    userType: ""
+    userType: "",
+    phoneNumber: ""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,6 +47,15 @@ const SignUp = () => {
       return;
     }
 
+    if (formData.userType === 'entrepreneur' && !formData.phoneNumber) {
+      toast({
+        title: "Error",
+        description: "Please enter your phone number",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     const { error } = await supabase.auth.signUp({
@@ -56,6 +65,7 @@ const SignUp = () => {
         data: {
           full_name: `${formData.firstName} ${formData.lastName}`,
           user_type: formData.userType,
+          phone_number: formData.userType === 'entrepreneur' ? formData.phoneNumber : undefined,
         },
         emailRedirectTo: `${window.location.origin}/login`,
       }
@@ -138,6 +148,20 @@ const SignUp = () => {
                 </div>
               </RadioGroup>
             </div>
+
+            {formData.userType === 'entrepreneur' && (
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="Your phone number"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  required
+                />
+              </div>
+            )}
             
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

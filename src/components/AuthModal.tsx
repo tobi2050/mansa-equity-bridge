@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Users, BookOpen, User, CheckCircle } from "lucide-react";
 import SignUpForm from "./SignUpForm";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,10 +21,11 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", defaultRole }: AuthModalProps) => {
-  const { login } = useAuth();
+  const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState<'investor' | 'entrepreneur' | null>(defaultRole || null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [currentTab, setCurrentTab] = useState(defaultTab);
 
@@ -34,11 +36,25 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
     }
   }, [defaultRole]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedRole) {
-      login(selectedRole);
+    if (!selectedRole) {
+      toast({ title: "Please select your role", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setIsLoading(false);
+
+    if (error) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Signed in successfully" });
       onLogin(selectedRole);
+      onClose();
     }
   };
 
@@ -50,7 +66,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
 
   const handleContinueToSignIn = () => {
     if (selectedRole) {
-      setCurrentTab("auth");
+      setCurrentTab("sign-in");
     }
   };
 
@@ -68,7 +84,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
         }}
         selectedRole={selectedRole}
         onSignUp={(role) => {
-          login(role); // This might be for a temporary session before email confirmation
           onLogin(role);
           setShowSignUpForm(false);
           onClose();
@@ -210,7 +225,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
               <p className="text-gray-600">Choose your role and sign in</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+            <form onSubmit={handleSignIn} className="space-y-4 max-w-md mx-auto">
               <div className="bg-white/70 p-4 rounded-lg">
                 <Label htmlFor="role" className="text-sm font-medium text-gray-700 mb-3 block">I am signing in as:</Label>
                 <RadioGroup 
@@ -258,9 +273,9 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = "role-selection", de
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg"
-                disabled={!selectedRole}
+                disabled={!selectedRole || isLoading}
               >
-                Sign In
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
 
