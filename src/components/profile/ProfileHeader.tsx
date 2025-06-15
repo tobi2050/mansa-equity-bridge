@@ -1,10 +1,12 @@
+import { useNavigate } from "react-router-dom";
+import { useNavigation } from "@/contexts/NavigationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, MessageCircle, Share2, MapPin, Calendar } from "lucide-react";
+import { User, Edit, MessageCircle, Share2, MapPin, Calendar, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 type ProfileHeaderProps = {
@@ -17,6 +19,8 @@ type ProfileHeaderProps = {
 };
 
 export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCount, followingCount }: ProfileHeaderProps) => {
+  const navigate = useNavigate();
+  const { canGoBack, goBack } = useNavigation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -74,6 +78,16 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
   return (
     <div>
       <div className={`h-36 md:h-48 bg-gradient-to-r ${gradientClass} relative`}>
+        {canGoBack && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goBack}
+            className="absolute top-4 left-4 bg-black/20 hover:bg-black/40 text-white rounded-full z-10"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        )}
         {profile.cover_image_url && (
           <img src={profile.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
         )}
@@ -88,7 +102,7 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
           </Avatar>
           <div className="flex gap-2 pt-12 md:pt-16">
             {isOwnProfile ? (
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => navigate('/complete-profile')}>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>

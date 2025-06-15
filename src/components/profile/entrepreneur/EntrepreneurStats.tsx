@@ -1,5 +1,4 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import VerificationTrustSection from "./VerificationTrustSection";
 import { DollarSign, TrendingUp, Target, Building2 } from "lucide-react";
 
@@ -22,12 +21,8 @@ const EntrepreneurStats = ({ profile, businesses }: { profile: any, businesses: 
   if (!aggregatedStats) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Entrepreneur Stats</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="p-6 bg-muted/50 rounded-lg space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           <StatCard 
             icon={<DollarSign className="w-5 h-5 text-green-600" />} 
             title="Total Funding" 
@@ -51,7 +46,7 @@ const EntrepreneurStats = ({ profile, businesses }: { profile: any, businesses: 
           />
         </div>
         
-        <div className="space-y-3 pt-4 border-t">
+        <div className="space-y-3 pt-6 border-t">
           <h4 className="text-sm font-medium text-muted-foreground">Verification & Trust</h4>
           <VerificationTrustSection profile={profile} />
           <div className="flex items-center gap-2 pt-2">
@@ -59,8 +54,7 @@ const EntrepreneurStats = ({ profile, businesses }: { profile: any, businesses: 
             <p className="font-bold text-lg text-primary">{profile.trust_score || 0}/100</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 
