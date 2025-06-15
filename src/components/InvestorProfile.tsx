@@ -36,33 +36,33 @@ const InvestorProfile = ({ isOwnProfile = false }: InvestorProfileProps) => {
   const { toast } = useToast();
 
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ['profile', authState.user?.id],
+    queryKey: ['profile', authState.userId],
     queryFn: async () => {
-      if (!authState.user?.id) return null;
+      if (!authState.userId) return null;
       const { data, error } = await supabase
         .from('profiles')
         .select('default_contribution_mode')
-        .eq('id', authState.user.id)
+        .eq('id', authState.userId)
         .single();
       if (error && error.code !== 'PGRST116') { // Ignore error for no rows found
         throw error;
       }
       return data;
     },
-    enabled: isOwnProfile && !!authState.user?.id,
+    enabled: isOwnProfile && !!authState.userId,
   });
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: { default_contribution_mode: 'investing' | 'donating' }) => {
-      if (!authState.user?.id) throw new Error("User not found");
+      if (!authState.userId) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', authState.user.id);
+        .eq('id', authState.userId);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', authState.user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['profile', authState.userId] });
       toast({
         title: "Settings saved",
         description: "Your profile settings have been updated.",
