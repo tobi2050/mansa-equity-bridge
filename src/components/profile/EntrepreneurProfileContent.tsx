@@ -1,4 +1,5 @@
 
+import EntrepreneurStats from "./entrepreneur/EntrepreneurStats";
 import EntrepreneurTabs from "./entrepreneur/EntrepreneurTabs";
 
 interface EntrepreneurProfileContentProps {
@@ -10,6 +11,7 @@ interface EntrepreneurProfileContentProps {
 const EntrepreneurProfileContent = ({ isOwnProfile, profile, businesses }: EntrepreneurProfileContentProps) => {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
+      <EntrepreneurStats profile={profile} businesses={businesses || []} />
       <EntrepreneurTabs
         profile={profile}
         businesses={businesses || []}

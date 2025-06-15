@@ -4,9 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, MessageCircle, Share2, MapPin, Calendar, Building2 } from "lucide-react";
+import { User, Edit, MessageCircle, Share2, MapPin, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import EntrepreneurStats from "./entrepreneur/EntrepreneurStats";
 
 type ProfileHeaderProps = {
   profile: any;
@@ -17,7 +16,7 @@ type ProfileHeaderProps = {
   businesses?: any[];
 };
 
-export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCount, followingCount, businesses }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCount, followingCount }: ProfileHeaderProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -105,8 +104,8 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-3">
+        <div className="mt-4">
+          <div className="space-y-3">
              <div>
                 <h1 className="text-2xl font-bold">{profile.full_name}</h1>
                 <p className="text-sm text-muted-foreground">@{profile.full_name?.toLowerCase().replace(/\s/g, '')}{/* A temporary username convention */}</p>
@@ -127,12 +126,6 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
                 <span className="hover:underline cursor-pointer"><span className="font-bold text-foreground">{followerCount}</span> Followers</span>
              </div>
           </div>
-          
-          {profile.role === 'entrepreneur' && (
-            <div className="md:col-span-1">
-              <EntrepreneurStats profile={profile} businesses={businesses || []} />
-            </div>
-          )}
         </div>
       </div>
     </div>
