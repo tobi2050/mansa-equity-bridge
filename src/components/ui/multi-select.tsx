@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
 
-type Framework = Record<"value" | "label", string>;
+export type Framework = Record<"value" | "label", string>;
 
 export function MultiSelect({
   options,

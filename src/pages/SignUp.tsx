@@ -12,18 +12,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { MultiSelect, Framework } from "@/components/ui/multi-select";
 import { industryCategories } from "@/lib/constants";
 import { SignUpSchema } from "@/lib/validations";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
+type SignUpFormValues = Omit<z.infer<typeof SignUpSchema>, "industryPreferences"> & {
+  industryPreferences?: Framework[];
+};
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof SignUpSchema>>({
+  const form = useForm<SignUpFormValues>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
       firstName: "",
