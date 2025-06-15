@@ -1,33 +1,47 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const from = location.state?.from?.pathname || "/";
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
-      navigate("/");
-    }, 1000);
+      navigate(from, { replace: true });
+    }
   };
 
   const handleSignUp = () => {
