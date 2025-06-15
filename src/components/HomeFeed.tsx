@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,13 +16,12 @@ import {
   Users,
   Bookmark,
   ArrowLeft,
-  Home,
   Plus
 } from "lucide-react";
 import BottomNavigation from "./BottomNavigation";
 
 interface HomeFeedProps {
-  userRole: 'investor' | 'entrepreneur' | 'philanthropist';
+  userRole: 'investor' | 'entrepreneur';
 }
 
 const HomeFeed = ({ userRole }: HomeFeedProps) => {
@@ -53,18 +51,6 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
       shares: 7,
       isLiked: true,
       hasImage: false
-    },
-    {
-      id: 3,
-      author: "Maria Santos",
-      role: "philanthropist",
-      time: "1 day ago",
-      content: "Just donated to Solar Power Ghana's community project. Amazing to see how renewable energy is transforming rural communities. This is the kind of impact we need more of! ☀️",
-      likes: 31,
-      comments: 5,
-      shares: 12,
-      isLiked: false,
-      hasImage: true
     }
   ]);
 
@@ -99,13 +85,11 @@ const HomeFeed = ({ userRole }: HomeFeedProps) => {
     switch (role) {
       case 'investor': return 'bg-green-100 text-green-800';
       case 'entrepreneur': return 'bg-blue-100 text-blue-800';
-      case 'philanthropist': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const handleUserClick = (author: string) => {
-    // Navigate to user profile
     navigate(`/profile/${author.toLowerCase().replace(' ', '-')}`);
   };
 
