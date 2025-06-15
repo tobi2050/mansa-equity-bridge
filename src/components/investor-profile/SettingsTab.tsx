@@ -30,7 +30,7 @@ export const SettingsTab = () => {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (updates: { default_contribution_mode: 'investing' | 'donating' }) => {
+    mutationFn: async (updates: { default_contribution_mode: 'investing' | 'donating' | 'supporting' }) => {
       if (!authState.userId) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
@@ -54,7 +54,7 @@ export const SettingsTab = () => {
     },
   });
 
-  const handleModeChange = (value: 'investing' | 'donating') => {
+  const handleModeChange = (value: 'investing' | 'donating' | 'supporting') => {
     updateProfileMutation.mutate({ default_contribution_mode: value });
   };
 
@@ -73,7 +73,7 @@ export const SettingsTab = () => {
               <Label htmlFor="contribution-mode">Default Contribution Mode</Label>
               <Select
                 value={profile?.default_contribution_mode || 'investing'}
-                onValueChange={(value: 'investing' | 'donating') => handleModeChange(value)}
+                onValueChange={(value: 'investing' | 'donating' | 'supporting') => handleModeChange(value)}
                 disabled={updateProfileMutation.isPending}
               >
                 <SelectTrigger id="contribution-mode" className="w-[280px]">
@@ -82,10 +82,11 @@ export const SettingsTab = () => {
                 <SelectContent>
                   <SelectItem value="investing">Investing</SelectItem>
                   <SelectItem value="donating">Donating</SelectItem>
+                  <SelectItem value="supporting">Supporting</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                Choose your default action when contributing to a project.
+                Investing provides equity, Donating is philanthropic, Supporting validates a business.
               </p>
             </div>
           )}

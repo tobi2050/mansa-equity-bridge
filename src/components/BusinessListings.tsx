@@ -10,25 +10,39 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Users, Calendar, MessageSquare } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { ValidationButton } from "./business/ValidationButton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const BusinessListings = () => {
-  const [businesses, setBusinesses] = useState([
-    {
-      id: 1,
-      title: "EcoFarm Nigeria - Organic Agriculture",
-      description: "Sustainable farming initiative connecting rural farmers with urban markets through organic certification and digital marketplace.",
-      stage: "Scaling",
-      fundingGoal: 75000,
-      currentFunding: 45000,
-      category: "Agriculture",
-      equityOffered: 15,
-      bidders: 8,
-      timeLeft: "12 days",
-      milestones: 5,
-      completedMilestones: 3,
-      status: "Active"
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const { data: businesses, isLoading: isLoadingBusinesses } = useQuery({
+    queryKey: ['businesses'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('businesses').select('*');
+      if (error) throw error;
+      // map to existing structure for less refactoring
+      return data.map(b => ({
+        id: b.id, // now a uuid string
+        title: b.name,
+        description: b.description || 'No description available.',
+        stage: "Scaling",
+        fundingGoal: 75000,
+        currentFunding: 45000,
+        category: "Agriculture",
+        equityOffered: 15,
+        bidders: 8,
+        timeLeft: "12 days",
+        milestones: 5,
+        completedMilestones: 3,
+        status: "Active"
+      }));
     }
-  ]);
+  });
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newBusiness, setNewBusiness] = useState({
@@ -41,34 +55,39 @@ const BusinessListings = () => {
     fundingType: "investment"
   });
 
+  const createBusinessMutation = useMutation({
+    mutationFn: async (businessData: { title: string, description: string }) => {
+      const { error } = await supabase.from('businesses').insert({
+        name: businessData.title,
+        description: businessData.description,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['businesses'] });
+      setShowCreateForm(false);
+      setNewBusiness({
+        title: "",
+        description: "",
+        category: "",
+        stage: "",
+        fundingGoal: "",
+        equityOffered: "",
+        fundingType: "investment"
+      });
+      toast({ title: "Success", description: "Business listing created." });
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  });
+
   const handleCreateBusiness = () => {
-    const business = {
-      id: businesses.length + 1,
-      title: newBusiness.title,
-      description: newBusiness.description,
-      stage: newBusiness.stage,
-      fundingGoal: parseInt(newBusiness.fundingGoal),
-      currentFunding: 0,
-      category: newBusiness.category,
-      equityOffered: parseInt(newBusiness.equityOffered),
-      bidders: 0,
-      timeLeft: "30 days",
-      milestones: 5,
-      completedMilestones: 0,
-      status: "Active"
-    };
-    
-    setBusinesses([...businesses, business]);
-    setNewBusiness({
-      title: "",
-      description: "",
-      category: "",
-      stage: "",
-      fundingGoal: "",
-      equityOffered: "",
-      fundingType: "investment"
-    });
-    setShowCreateForm(false);
+    if (!newBusiness.title || !newBusiness.description) {
+      toast({ title: "Missing fields", description: "Please fill out title and description.", variant: "destructive"});
+      return;
+    }
+    createBusinessMutation.mutate(newBusiness);
   };
 
   const getStageColor = (stage: string) => {
@@ -196,9 +215,10 @@ const BusinessListings = () => {
 
               <Button 
                 onClick={handleCreateBusiness}
+                disabled={createBusinessMutation.isPending}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
               >
-                Create Business Listing
+                {createBusinessMutation.isPending ? "Creating..." : "Create Business Listing"}
               </Button>
             </div>
           </DialogContent>
@@ -206,7 +226,9 @@ const BusinessListings = () => {
       </div>
 
       <div className="grid gap-6">
-        {businesses.map((business) => (
+        {isLoadingBusinesses ? (
+          [1,2].map(i => <Skeleton key={i} className="h-80 w-full" />)
+        ) : businesses?.map((business) => (
           <Card key={business.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -283,7 +305,8 @@ const BusinessListings = () => {
                     <span>{business.timeLeft} left</span>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <ValidationButton businessId={business.id} />
                   <Button variant="outline" size="sm">
                     <MessageSquare className="h-4 w-4 mr-1" />
                     View Bids

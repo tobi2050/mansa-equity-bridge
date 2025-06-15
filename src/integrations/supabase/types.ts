@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      business_validations: {
+        Row: {
+          business_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_validations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           bio: string | null
@@ -77,7 +124,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      contribution_mode: "investing" | "donating"
+      contribution_mode: "investing" | "donating" | "supporting"
       investor_motivation: "ROI-focused" | "Impact-focused" | "Mixed"
       investor_org_type: "Individual" | "NGO" | "Charity" | "Investment Firm"
       user_role: "entrepreneur" | "investor"
@@ -196,7 +243,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      contribution_mode: ["investing", "donating"],
+      contribution_mode: ["investing", "donating", "supporting"],
       investor_motivation: ["ROI-focused", "Impact-focused", "Mixed"],
       investor_org_type: ["Individual", "NGO", "Charity", "Investment Firm"],
       user_role: ["entrepreneur", "investor"],
