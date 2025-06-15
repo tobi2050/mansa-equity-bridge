@@ -1,30 +1,39 @@
 
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { LoginSchema } from "@/lib/validations";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const from = location.state?.from?.pathname || "/";
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setIsLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: values.email,
+      password: values.password,
     });
 
     setIsLoading(false);
@@ -32,7 +41,7 @@ const Login = () => {
     if (error) {
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     } else {
@@ -56,48 +65,62 @@ const Login = () => {
           <CardDescription>Welcome back to your investment platform</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-amber-600 hover:bg-amber-700"
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign In"}
-            </Button>
-            <div className="text-center">
-              <Button variant="link" onClick={() => navigate("/forgot-password")}>
-                Forgot Password?
+              <Button 
+                type="submit" 
+                className="w-full bg-amber-600 hover:bg-amber-700"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
-            </div>
-            <div className="text-center">
-              <span className="text-sm text-gray-600">Don't have an account? </span>
-              <Button variant="link" onClick={handleSignUp} className="p-0">
-                Sign up
-              </Button>
-            </div>
-          </form>
+              <div className="text-center">
+                <Button variant="link" onClick={() => navigate("/forgot-password")}>
+                  Forgot Password?
+                </Button>
+              </div>
+              <div className="text-center">
+                <span className="text-sm text-gray-600">Don't have an account? </span>
+                <Button variant="link" onClick={handleSignUp} className="p-0">
+                  Sign up
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

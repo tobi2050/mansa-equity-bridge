@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { SignUpFormData } from "./auth/types";
 import InvestorSignUpFields from "./auth/InvestorSignUpFields";
 import EntrepreneurSignUpFields from "./auth/EntrepreneurSignUpFields";
+import { SignUpFormSchema } from "@/lib/validations";
 
 interface SignUpFormProps {
   isOpen: boolean;
@@ -41,38 +41,35 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const result = SignUpFormSchema.safeParse(formData);
 
-    if (!formData.agreeToTerms) {
-      toast({
-        title: "Error",
-        description: "You must agree to the terms and conditions.",
-        variant: "destructive",
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        toast({
+          title: "Invalid Input",
+          description: issue.message,
+          variant: "destructive",
+        });
       });
       return;
     }
     
     setIsLoading(true);
 
+    const { data: validatedData } = result;
+
     const { error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
+      email: validatedData.email,
+      password: validatedData.password,
       options: {
         data: {
-          full_name: formData.fullName,
+          full_name: validatedData.fullName,
           user_type: selectedRole,
           ...(selectedRole === 'investor' && {
-            organization_type: formData.organizationType,
-            investment_motivation: formData.investmentMotivation,
-            industry_preferences: formData.industryPreferences.map(p => p.value),
-            default_contribution_mode: formData.defaultContributionMode,
+            organization_type: validatedData.organizationType,
+            investment_motivation: validatedData.investmentMotivation,
+            industry_preferences: validatedData.industryPreferences.map(p => p.value),
+            default_contribution_mode: validatedData.defaultContributionMode,
           }),
         },
         emailRedirectTo: `${window.location.origin}/login`,
@@ -85,7 +82,7 @@ const SignUpForm = ({ isOpen, onClose, selectedRole, onSignUp }: SignUpFormProps
       console.error("Error signing up:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "An error occurred during sign up. Please try again.",
         variant: "destructive",
       });
     } else {

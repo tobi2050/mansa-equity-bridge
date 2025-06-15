@@ -1,6 +1,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,74 +14,48 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { industryCategories } from "@/lib/constants";
+import { SignUpSchema } from "@/lib/validations";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [formData, setFormData] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    userType: "investor" | "entrepreneur" | "";
-    organizationType: string;
-    investmentMotivation: string;
-    industryPreferences: { value: string; label: string }[];
-    defaultContributionMode: string;
-  }>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    userType: "",
-    organizationType: "Individual",
-    investmentMotivation: "ROI-focused",
-    industryPreferences: [],
-    defaultContributionMode: "investing",
-  });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      userType: undefined,
+      organizationType: "Individual",
+      investmentMotivation: "ROI-focused",
+      industryPreferences: [],
+      defaultContributionMode: "investing",
+    },
+  });
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return;
-    }
+  const userType = form.watch("userType");
 
-    if (!formData.userType) {
-      toast({
-        title: "Error",
-        description: "Please select your user type",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
     setIsLoading(true);
     
     const { error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
+      email: values.email,
+      password: values.password,
       options: {
         data: {
-          full_name: `${formData.firstName} ${formData.lastName}`,
-          user_type: formData.userType,
-          ...(formData.userType === 'investor' && {
-            organization_type: formData.organizationType,
-            investment_motivation: formData.investmentMotivation,
-            industry_preferences: formData.industryPreferences.map(p => p.value),
-            default_contribution_mode: formData.defaultContributionMode,
+          full_name: `${values.firstName} ${values.lastName}`,
+          user_type: values.userType,
+          ...(values.userType === 'investor' && {
+            organization_type: values.organizationType,
+            investment_motivation: values.investmentMotivation,
+            industry_preferences: values.industryPreferences?.map(p => p.value),
+            default_contribution_mode: values.defaultContributionMode,
           }),
         },
         emailRedirectTo: `${window.location.origin}/login`,
@@ -90,7 +67,7 @@ const SignUp = () => {
     if (error) {
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: "An error occurred during sign up. Please try again.",
         variant: "destructive",
       });
     } else {
@@ -110,150 +87,213 @@ const SignUp = () => {
           <CardDescription>Create your account to get started</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange("firstName", e.target.value)}
-                  required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                required
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="john@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label>I am a:</Label>
-              <RadioGroup 
-                value={formData.userType} 
-                onValueChange={(value) => handleInputChange("userType", value)}
-                className="flex gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="entrepreneur" id="entrepreneur" />
-                  <Label htmlFor="entrepreneur">Entrepreneur</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="investor" id="investor" />
-                  <Label htmlFor="investor">Investor / Supporter</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            {formData.userType === 'investor' && (
-              <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="text-lg font-medium text-gray-800">Investor Details</h3>
-                <div>
-                  <Label>Your Organization Type</Label>
-                  <Select value={formData.organizationType} onValueChange={(value) => handleInputChange("organizationType", value)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Individual">Individual</SelectItem>
-                      <SelectItem value="NGO">NGO</SelectItem>
-                      <SelectItem value="Charity">Charity</SelectItem>
-                      <SelectItem value="Investment Firm">Investment Firm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Your Primary Motivation</Label>
-                  <Select value={formData.investmentMotivation} onValueChange={(value) => handleInputChange("investmentMotivation", value)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ROI-focused">ROI-focused</SelectItem>
-                      <SelectItem value="Impact-focused">Impact-focused</SelectItem>
-                      <SelectItem value="Mixed">Mixed (ROI & Impact)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Industries of Interest (up to 3)</Label>
-                  <MultiSelect
-                    options={industryCategories}
-                    selected={formData.industryPreferences}
-                    onChange={(value) => handleInputChange("industryPreferences", value)}
-                    className="w-full"
+              <FormField
+                control={form.control}
+                name="userType"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>I am a:</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex gap-4"
+                      >
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <RadioGroupItem value="entrepreneur" id="r-entrepreneur" />
+                          </FormControl>
+                          <Label htmlFor="r-entrepreneur" className="font-normal">Entrepreneur</Label>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2">
+                           <FormControl>
+                            <RadioGroupItem value="investor" id="r-investor" />
+                          </FormControl>
+                          <Label htmlFor="r-investor" className="font-normal">Investor / Supporter</Label>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {userType === 'investor' && (
+                <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="text-lg font-medium text-gray-800">Investor Details</h3>
+                  <FormField
+                    control={form.control}
+                    name="organizationType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Organization Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Individual">Individual</SelectItem>
+                            <SelectItem value="NGO">NGO</SelectItem>
+                            <SelectItem value="Charity">Charity</SelectItem>
+                            <SelectItem value="Investment Firm">Investment Firm</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Select your preferred investment sectors.</p>
+                  <FormField
+                    control={form.control}
+                    name="investmentMotivation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Primary Motivation</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                           <FormControl>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="ROI-focused">ROI-focused</SelectItem>
+                            <SelectItem value="Impact-focused">Impact-focused</SelectItem>
+                            <SelectItem value="Mixed">Mixed (ROI & Impact)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="industryPreferences"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Industries of Interest (up to 3)</FormLabel>
+                        <FormControl>
+                          <MultiSelect
+                            options={industryCategories}
+                            selected={field.value || []}
+                            onChange={field.onChange}
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-xs text-gray-500 mt-1">Select your preferred investment sectors.</p>
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="defaultContributionMode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Default Contribution Mode</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                           <FormControl>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="investing">Investing</SelectItem>
+                            <SelectItem value="donating">Donating</SelectItem>
+                            <SelectItem value="supporting">Supporting</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        <p className="text-xs text-gray-500 mt-1">This will be your default action on projects.</p>
+                      </FormItem>
+                    )}
+                  />
                 </div>
-                <div>
-                  <Label>Default Contribution Mode</Label>
-                  <Select value={formData.defaultContributionMode} onValueChange={(value) => handleInputChange("defaultContributionMode", value)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="investing">Investing</SelectItem>
-                      <SelectItem value="donating">Donating</SelectItem>
-                      <SelectItem value="supporting">Supporting</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500 mt-1">This will be your default action on projects.</p>
-                </div>
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                required
+              )}
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Create a password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                required
+              
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Confirm your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-amber-600 hover:bg-amber-700"
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
-            
-            <div className="text-center">
-              <span className="text-sm text-gray-600">Already have an account? </span>
-              <Button variant="link" onClick={() => navigate("/login")} className="p-0">
-                Sign in
+              
+              <Button 
+                type="submit" 
+                className="w-full bg-amber-600 hover:bg-amber-700"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
-            </div>
-          </form>
+              
+              <div className="text-center">
+                <span className="text-sm text-gray-600">Already have an account? </span>
+                <Button variant="link" onClick={() => navigate("/login")} className="p-0">
+                  Sign in
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
