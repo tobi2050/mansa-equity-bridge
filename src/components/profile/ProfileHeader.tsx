@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, MessageCircle, Share2, MapPin, Calendar, ArrowLeft } from "lucide-react";
+import { User, Edit, MessageCircle, Share2, MapPin, Calendar, ArrowLeft, Home } from "lucide-react";
 import { toast } from "sonner";
 
 type ProfileHeaderProps = {
@@ -79,16 +79,28 @@ export const ProfileHeader = ({ profile, isOwnProfile, isFollowing, followerCoun
   return (
     <div>
       <div className={`h-36 md:h-48 bg-gradient-to-r ${gradientClass} relative`}>
-        {canGoBack && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={goBack}
-            className="absolute top-4 left-4 bg-black/20 hover:bg-black/40 text-white rounded-full z-10"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        )}
+        <div className="absolute top-4 left-4 flex gap-2 z-10">
+          {canGoBack ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goBack}
+              className="bg-black/20 hover:bg-black/40 text-white rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="bg-black/20 hover:bg-black/40 text-white rounded-full"
+              title="Back to Dashboard"
+            >
+              <Home className="w-5 h-5" />
+            </Button>
+          )}
+        </div>
         {profile.cover_image_url && (
           <img src={profile.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
         )}
