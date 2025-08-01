@@ -1,0 +1,24 @@
+{
+  "name": "MANSA Equity Bridge",
+  "short_name": "MANSA",
+  "description": "MANSA Equity Bridge - Connecting Entrepreneurs and Investors",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png?v=4",
+      "sizes": "180x180 152x152 144x144 120x120 114x114 76x76 72x72 60x60 57x57",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
